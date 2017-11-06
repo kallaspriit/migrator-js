@@ -13,6 +13,9 @@ const path = require("path");
 const typeorm_1 = require("typeorm");
 const _1 = require("../");
 const typeorm_2 = require("../storage/typeorm");
+// re-export the built-in TypeORM storage
+var typeorm_3 = require("../storage/typeorm");
+exports.MigratorTypeormStorage = typeorm_3.default;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
