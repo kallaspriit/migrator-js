@@ -1,6 +1,6 @@
 {
 	"name": "migrator-js",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"description": "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
 	"main": "build/index.js",
 	"types": "build/index.d.ts",
