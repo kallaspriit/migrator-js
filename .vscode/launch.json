@@ -1,0 +1,24 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch example",
+			"program": "${workspaceFolder}/build/example/index.js",
+			"preLaunchTask": "tsc: build - tsconfig.json",
+			"outFiles": ["${workspaceFolder}/build/**/*.js"]
+		},
+		{
+			"name": "Debug jest",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": ["${workspaceRoot}/node_modules/jest/bin/jest.js", "--runInBand"],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		}
+	]
+}
