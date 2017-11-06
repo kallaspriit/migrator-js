@@ -8,7 +8,7 @@ import {
 	PrimaryColumn,
 	UpdateDateColumn,
 } from 'typeorm';
-import {IMigrationInfo, IMigrationStorage, MigrationStatus} from '../../';
+import {IMigrationInfo, IMigrationStorage, MigrationStatus} from '../../index';
 
 export interface IDatabaseResult {
 	[x: string]: string | number;

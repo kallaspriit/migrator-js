@@ -1,11 +1,8 @@
 import chalk from 'chalk';
 import * as path from 'path';
 import {Connection, ConnectionOptions, createConnection} from 'typeorm';
-import {migrate} from '../';
+import {migrate} from '../index';
 import MigratorTypeormStorage from '../storage/typeorm';
-
-// re-export the built-in TypeORM storage
-export {MigratorTypeormStorage};
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
 
@@ -19,7 +16,7 @@ async function run() {
 	// see http://typeorm.io
 	const connectionOptions: ConnectionOptions = {
 		type: 'sqlite',
-		database: path.join(__dirname, '..', '..', 'example-database.sqlite3'),
+		database: path.join(__dirname, '..', '..', 'migrate.sqlite3'),
 	};
 	const connection = await createConnection(connectionOptions);
 
