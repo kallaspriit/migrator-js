@@ -1,5 +1,6 @@
 import { Connection } from 'typeorm';
-export { default as MigratorTypeormStorage } from '../storage/typeorm';
+import MigratorTypeormStorage from '../storage/typeorm';
+export { MigratorTypeormStorage };
 export interface IMigrationContext {
     connection: Connection;
 }

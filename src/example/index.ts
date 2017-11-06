@@ -5,7 +5,7 @@ import {migrate} from '../';
 import MigratorTypeormStorage from '../storage/typeorm';
 
 // re-export the built-in TypeORM storage
-export {default as MigratorTypeormStorage} from '../storage/typeorm';
+export {MigratorTypeormStorage};
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
 

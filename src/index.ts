@@ -4,6 +4,8 @@ import * as Listr from 'listr';
 import * as path from 'path';
 import * as naturalSort from 'string-natural-compare';
 
+export {default as MigratorTypeormStorage} from './storage/typeorm';
+
 export enum MigrationStatus {
 	PENDING = 'PENDING',
 	RUNNING = 'RUNNING',

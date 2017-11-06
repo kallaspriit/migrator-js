@@ -13,6 +13,8 @@ const inquirer = require("inquirer");
 const Listr = require("listr");
 const path = require("path");
 const naturalSort = require("string-natural-compare");
+var typeorm_1 = require("./storage/typeorm");
+exports.MigratorTypeormStorage = typeorm_1.default;
 var MigrationStatus;
 (function (MigrationStatus) {
     MigrationStatus["PENDING"] = "PENDING";

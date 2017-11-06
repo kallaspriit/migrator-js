@@ -1,3 +1,4 @@
+export { default as MigratorTypeormStorage } from './storage/typeorm';
 export declare enum MigrationStatus {
     PENDING = "PENDING",
     RUNNING = "RUNNING",
