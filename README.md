@@ -1,4 +1,4 @@
-# Express.js error renderer middleware
+# Simple extensible node migrator library.
 
 [![Travis](https://img.shields.io/travis/kallaspriit/migrator-js.svg)](https://travis-ci.org/kallaspriit/migrator-js)
 [![Coverage](https://img.shields.io/coveralls/kallaspriit/migrator-js.svg)](https://coveralls.io/github/kallaspriit/migrator-js)
@@ -35,9 +35,9 @@ npm install migrator-js
 
 ## Example
 
-![Choose migrations](https://github.com/kallaspriit/express-error-renderer/blob/master/screenshots/choose-migrations.png)
+![Choose migrations](https://raw.githubusercontent.com/kallaspriit/migrator-js/master/screenshots/choose-migrations.png)
 
-![Result](https://github.com/kallaspriit/express-error-renderer/blob/master/screenshots/result.png)
+![Result](https://raw.githubusercontent.com/kallaspriit/migrator-js/master/screenshots/result.png)
 
 See `src/example` directory for a full working example code and run `npm start` to try it out for yourself.
 
