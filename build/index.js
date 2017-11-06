@@ -13,15 +13,9 @@ const inquirer = require("inquirer");
 const Listr = require("listr");
 const path = require("path");
 const naturalSort = require("string-natural-compare");
+const common_1 = require("./common");
 var typeorm_1 = require("./storage/typeorm");
 exports.MigratorTypeormStorage = typeorm_1.default;
-var MigrationStatus;
-(function (MigrationStatus) {
-    MigrationStatus["PENDING"] = "PENDING";
-    MigrationStatus["RUNNING"] = "RUNNING";
-    MigrationStatus["COMPLETE"] = "COMPLETE";
-    MigrationStatus["FAILED"] = "FAILED";
-})(MigrationStatus = exports.MigrationStatus || (exports.MigrationStatus = {}));
 class Migration {
     constructor(name, filename, context, storage) {
         this.name = name;
@@ -29,7 +23,7 @@ class Migration {
         this.context = context;
         this.storage = storage;
         this.timeTaken = 0;
-        this.status = MigrationStatus.PENDING;
+        this.status = common_1.MigrationStatus.PENDING;
     }
     run() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -41,14 +35,14 @@ class Migration {
                     startTime = Date.now();
                     this.result = yield migration(this.context);
                     this.timeTaken = Date.now() - startTime;
-                    this.status = MigrationStatus.COMPLETE;
+                    this.status = common_1.MigrationStatus.COMPLETE;
                     yield this.storage.updateMigration(this.name, this.status, this.result, this.timeTaken);
                     resolve(this.result);
                 }
                 catch (e) {
                     this.result = e.message;
                     this.timeTaken = Date.now() - startTime;
-                    this.status = MigrationStatus.FAILED;
+                    this.status = common_1.MigrationStatus.FAILED;
                     yield this.storage.updateMigration(this.name, this.status, e.stack, this.timeTaken);
                     reject(e);
                 }
@@ -145,8 +139,8 @@ function migrate(options) {
             resolve({
                 pendingMigrations,
                 chosenMigrations,
-                performedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.COMPLETE),
-                failedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.FAILED),
+                performedMigrations: chosenMigrations.filter(migration => migration.status === common_1.MigrationStatus.COMPLETE),
+                failedMigrations: chosenMigrations.filter(migration => migration.status === common_1.MigrationStatus.FAILED),
             });
         }));
     });

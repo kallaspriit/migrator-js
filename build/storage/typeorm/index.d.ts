@@ -1,5 +1,5 @@
 import { Connection, ConnectionOptions } from 'typeorm';
-import { IMigrationInfo, IMigrationStorage, MigrationStatus } from '../../';
+import { IMigrationInfo, IMigrationStorage, MigrationStatus } from '../../common';
 export interface IDatabaseResult {
     [x: string]: string | number;
 }

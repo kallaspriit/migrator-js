@@ -11,16 +11,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = require("chalk");
 const path = require("path");
 const typeorm_1 = require("typeorm");
-const _1 = require("../");
+const index_1 = require("../index");
 const typeorm_2 = require("../storage/typeorm");
-exports.MigratorTypeormStorage = typeorm_2.default;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
         // see http://typeorm.io
         const connectionOptions = {
             type: 'sqlite',
-            database: path.join(__dirname, '..', '..', 'example-database.sqlite3'),
+            database: path.join(__dirname, '..', '..', 'migrate.sqlite3'),
         };
         const connection = yield typeorm_1.createConnection(connectionOptions);
         // show an empty line between previous content
@@ -30,7 +29,7 @@ function run() {
         // attempt to run the migrator
         try {
             // run migrator providing pattern of migration files, storage to use and context to pass to each migration
-            const result = yield _1.migrate({
+            const result = yield index_1.migrate({
                 pattern: path.join(__dirname, 'migrations', '*.js'),
                 storage: new typeorm_2.default(connectionOptions),
                 context: {

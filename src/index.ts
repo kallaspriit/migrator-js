@@ -3,47 +3,19 @@ import * as inquirer from 'inquirer';
 import * as Listr from 'listr';
 import * as path from 'path';
 import * as naturalSort from 'string-natural-compare';
+import {
+	IMigration,
+	IMigrationInfo,
+	IMigrationResult,
+	IMigrationStorage,
+	IMigratorOptions,
+	MigrationExecutorFn,
+	MigrationStatus,
+} from './common';
 
 export {default as MigratorTypeormStorage} from './storage/typeorm';
 
-export enum MigrationStatus {
-	PENDING = 'PENDING',
-	RUNNING = 'RUNNING',
-	COMPLETE = 'COMPLETE',
-	FAILED = 'FAILED',
-}
-
-export interface IMigrationInfo {
-	name: string;
-	status: MigrationStatus;
-	timeTaken: number;
-	result: string;
-	startDate: Date;
-	endDate: Date;
-}
-
-export interface IMigrationStorage {
-	getPerformedMigrations(): Promise<IMigrationInfo[]>;
-	insertMigration(name: string): Promise<void>;
-	updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
-}
-
-export type MigrationExecutorFn<Context> = (context: Context) => Promise<string>;
-
-export interface IMigratorOptions<Context> {
-	pattern: string;
-	storage: IMigrationStorage;
-	context: Context;
-}
-
-export interface IMigrationResult<Context> {
-	pendingMigrations: Array<Migration<Context>>;
-	chosenMigrations: Array<Migration<Context>>;
-	performedMigrations: Array<Migration<Context>>;
-	failedMigrations: Array<Migration<Context>>;
-}
-
-export class Migration<Context> {
+export class Migration<Context> implements IMigration {
 	public timeTaken: number = 0;
 	public result?: string;
 	public status = MigrationStatus.PENDING;
@@ -134,8 +106,8 @@ export default class Migrator<T> {
 	}
 }
 
-export async function migrate<Context>(options: IMigratorOptions<Context>): Promise<IMigrationResult<Context>> {
-	return new Promise<IMigrationResult<Context>>(async (resolve, _reject) => {
+export async function migrate<Context>(options: IMigratorOptions<Context>): Promise<IMigrationResult> {
+	return new Promise<IMigrationResult>(async (resolve, _reject) => {
 		const migrator = new Migrator<Context>(options);
 		const pendingMigrations = await migrator.getPendingMigrations();
 

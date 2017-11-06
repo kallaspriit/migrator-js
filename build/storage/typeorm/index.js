@@ -18,7 +18,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const _1 = require("../../");
+const common_1 = require("../../common");
 let Migration = class Migration {
 };
 __decorate([
@@ -26,7 +26,7 @@ __decorate([
     __metadata("design:type", String)
 ], Migration.prototype, "name", void 0);
 __decorate([
-    typeorm_1.Column({ type: 'varchar', nullable: false, default: _1.MigrationStatus.RUNNING }),
+    typeorm_1.Column({ type: 'varchar', nullable: false, default: common_1.MigrationStatus.RUNNING }),
     __metadata("design:type", String)
 ], Migration.prototype, "status", void 0);
 __decorate([
@@ -60,7 +60,7 @@ class MigratorTypeormStorage {
             const connection = yield this.getConnection();
             const performedMigrations = connection.getRepository(Migration).find({
                 where: {
-                    status: _1.MigrationStatus.COMPLETE,
+                    status: common_1.MigrationStatus.COMPLETE,
                 },
             });
             yield connection.close();
@@ -72,7 +72,7 @@ class MigratorTypeormStorage {
             const connection = yield this.getConnection();
             connection.getRepository(Migration).save({
                 name,
-                status: _1.MigrationStatus.RUNNING,
+                status: common_1.MigrationStatus.RUNNING,
             });
             yield connection.close();
         });
@@ -99,14 +99,14 @@ class MigratorTypeormStorage {
     }
     resolveStatus(statusName) {
         switch (statusName) {
-            case _1.MigrationStatus.RUNNING:
-                return _1.MigrationStatus.RUNNING;
-            case _1.MigrationStatus.COMPLETE:
-                return _1.MigrationStatus.COMPLETE;
-            case _1.MigrationStatus.FAILED:
-                return _1.MigrationStatus.FAILED;
+            case common_1.MigrationStatus.RUNNING:
+                return common_1.MigrationStatus.RUNNING;
+            case common_1.MigrationStatus.COMPLETE:
+                return common_1.MigrationStatus.COMPLETE;
+            case common_1.MigrationStatus.FAILED:
+                return common_1.MigrationStatus.FAILED;
             default:
-                return _1.MigrationStatus.FAILED;
+                return common_1.MigrationStatus.FAILED;
         }
     }
 }
