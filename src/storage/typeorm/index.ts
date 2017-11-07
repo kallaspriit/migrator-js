@@ -88,12 +88,18 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 	}
 
 	protected async getConnection(): Promise<Connection> {
-		return createConnection({
+		const connection = await createConnection({
 			...this.connectionOptions,
 			name: `migrator-${++this.connectionCount}`,
 			entities: [Migration],
 			synchronize: true,
 		});
+
+		if (!connection.isConnected) {
+			throw new Error(`Connecting to migrator-js database failed (${JSON.stringify(this.connectionOptions)})`);
+		}
+
+		return connection;
 	}
 
 	protected resolveStatus(statusName: string): MigrationStatus {

@@ -94,7 +94,11 @@ class MigratorTypeormStorage {
     }
     getConnection() {
         return __awaiter(this, void 0, void 0, function* () {
-            return typeorm_1.createConnection(Object.assign({}, this.connectionOptions, { name: `migrator-${++this.connectionCount}`, entities: [Migration], synchronize: true }));
+            const connection = yield typeorm_1.createConnection(Object.assign({}, this.connectionOptions, { name: `migrator-${++this.connectionCount}`, entities: [Migration], synchronize: true }));
+            if (!connection.isConnected) {
+                throw new Error(`Connecting to migrator-js database failed (${JSON.stringify(this.connectionOptions)})`);
+            }
+            return connection;
         });
     }
     resolveStatus(statusName) {
