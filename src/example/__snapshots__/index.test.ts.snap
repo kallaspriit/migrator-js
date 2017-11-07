@@ -83,6 +83,14 @@ Array [
 `;
 
 exports[`migrator-js should provide list of pending migrations 1`] = `
+Object {
+  "name": "001-test-migration.ts",
+  "result": undefined,
+  "status": "PENDING",
+}
+`;
+
+exports[`migrator-js should provide list of pending migrations 2`] = `
 Array [
   Object {
     "name": "001-test-migration.ts",

@@ -126,18 +126,26 @@ function migrate(context, options) {
                 });
                 return;
             }
-            const choiceResult = yield inquirer.prompt([
-                {
-                    type: 'checkbox',
-                    name: 'chosenMigrations',
-                    message: 'Choose migrations to execute',
-                    choices: pendingMigrations.map(pendingMigration => ({
-                        name: pendingMigration.name,
-                        value: pendingMigration.filename,
-                    })),
-                },
-            ]);
-            const chosenMigrationFilenames = choiceResult.chosenMigrations;
+            let chosenMigrationFilenames = [];
+            /* istanbul ignore else  */
+            if (options.autorunAll) {
+                chosenMigrationFilenames = pendingMigrations.map(pendingMigration => pendingMigration.filename);
+            }
+            else {
+                // this is very hard to test
+                const choiceResult = yield inquirer.prompt([
+                    {
+                        type: 'checkbox',
+                        name: 'chosenMigrations',
+                        message: 'Choose migrations to execute',
+                        choices: pendingMigrations.map(pendingMigration => ({
+                            name: pendingMigration.name,
+                            value: pendingMigration.filename,
+                        })),
+                    },
+                ]);
+                chosenMigrationFilenames = choiceResult.chosenMigrations;
+            }
             const chosenMigrations = pendingMigrations.filter(pendingMigration => chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1);
             const taskRunner = new Listr(chosenMigrations.map(migration => ({
                 title: migration.name,

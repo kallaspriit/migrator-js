@@ -3,8 +3,8 @@ import migrate, {
 	Connection,
 	ConnectionOptions,
 	createConnection,
+	IMigration,
 	IMigratorOptions,
-	Migration,
 	MigrationStatus,
 	Migrator,
 	MigratorTypeormStorage,
@@ -49,13 +49,11 @@ async function setupMigrator(): Promise<Migrator<IMigrationContext>> {
 	);
 }
 
-function preprocessSnapshot(migration: Migration<IMigrationContext>): IMigrationSnapshot {
-	const info = migration.toJSON();
-
+function preprocessSnapshot(migration: IMigration): IMigrationSnapshot {
 	return {
-		name: info.name,
-		status: info.status,
-		result: info.result,
+		name: migration.name,
+		status: migration.status,
+		result: migration.result,
 	};
 }
 
@@ -64,6 +62,7 @@ describe('migrator-js', () => {
 		const migrator = await setupMigrator();
 		const pendingMigrations = await migrator.getPendingMigrations();
 
+		expect(preprocessSnapshot(pendingMigrations[0].toJSON())).toMatchSnapshot();
 		expect(pendingMigrations.map(preprocessSnapshot)).toMatchSnapshot();
 	});
 
