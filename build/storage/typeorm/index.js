@@ -59,11 +59,14 @@ class MigratorTypeormStorage {
         return __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.getConnection();
             try {
-                return connection.getRepository(Migration).find({
+                const repository = connection.getRepository(Migration);
+                const migrations = yield repository.find({
                     where: {
                         status: common_1.MigrationStatus.COMPLETE,
                     },
                 });
+                console.log('migrations', migrations);
+                return migrations;
             }
             catch (e) {
                 console.error('Fetching performed migrations failed', e.stack);

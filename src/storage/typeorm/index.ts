@@ -43,11 +43,16 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 		const connection = await this.getConnection();
 
 		try {
-			return connection.getRepository(Migration).find({
+			const repository = connection.getRepository(Migration);
+			const migrations = await repository.find({
 				where: {
 					status: MigrationStatus.COMPLETE,
 				},
 			});
+
+			console.log('migrations', migrations);
+
+			return migrations;
 		} catch (e) {
 			console.error('Fetching performed migrations failed', e.stack);
 
