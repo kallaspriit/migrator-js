@@ -1,8 +1,7 @@
 {
 	"name": "migrator-js",
-	"version": "2.1.0",
-	"description":
-		"Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
+	"version": "2.1.1",
+	"description": "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
 	"main": "build/index.js",
 	"types": "build/index.d.ts",
 	"scripts": {
@@ -17,15 +16,22 @@
 		"test-watch": "jest --watch --collectCoverage",
 		"coverage": "yarn tidy:coverage && jest --collectCoverage",
 		"coveralls": "yarn coverage && cat ./coverage/lcov.info | coveralls",
-		"prettier":
-			"prettier --trailing-comma all --single-quote --use-tabs --no-bracket-spacing --print-width 120 --write src/**/*.ts",
+		"prettier": "prettier --trailing-comma all --single-quote --use-tabs --no-bracket-spacing --print-width 120 --write src/**/*.ts",
 		"precommit": "yarn lint && yarn test && yarn prettier && git add -A"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/kallaspriit/migrator-js.git"
 	},
-	"keywords": ["express", "error", "renderer", "pretty", "stack", "trace", "sourcemap"],
+	"keywords": [
+		"express",
+		"error",
+		"renderer",
+		"pretty",
+		"stack",
+		"trace",
+		"sourcemap"
+	],
 	"author": "Priit Kallas <kallaspriit@gmail.com>",
 	"license": "MIT",
 	"bugs": {
@@ -62,12 +68,23 @@
 		"transform": {
 			"^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
 		},
-		"roots": ["src"],
+		"roots": [
+			"src"
+		],
 		"mapCoverage": true,
 		"collectCoverage": false,
-		"collectCoverageFrom": ["**/src/index.ts", "**/routes/**/*.ts", "!**/routes/index-route.ts"],
+		"collectCoverageFrom": [
+			"**/src/index.ts",
+			"**/routes/**/*.ts",
+			"!**/routes/index-route.ts"
+		],
 		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
-		"moduleFileExtensions": ["ts", "tsx", "js", "json"]
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js",
+			"json"
+		]
 	},
 	"config": {
 		"ghooks": {
