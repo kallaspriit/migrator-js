@@ -19,10 +19,10 @@ export interface IMigrationStorage {
     updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
 }
 export declare type MigrationExecutorFn<Context> = (context: Context) => Promise<string>;
-export interface IMigratorOptions<Context> {
+export interface IMigratorOptions {
     pattern: string;
     storage: IMigrationStorage;
-    context: Context;
+    autorunAll: boolean;
 }
 export interface IMigrationResult {
     pendingMigrations: IMigration[];

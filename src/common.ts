@@ -23,10 +23,10 @@ export interface IMigrationStorage {
 
 export type MigrationExecutorFn<Context> = (context: Context) => Promise<string>;
 
-export interface IMigratorOptions<Context> {
+export interface IMigratorOptions {
 	pattern: string;
 	storage: IMigrationStorage;
-	context: Context;
+	autorunAll: boolean;
 }
 
 export interface IMigrationResult {

@@ -27,12 +27,11 @@ function run() {
         // attempt to run the migrator
         try {
             // run migrator providing pattern of migration files, storage to use and context to pass to each migration
-            const result = yield index_1.migrate({
+            const result = yield index_1.default({
+                connection,
+            }, {
                 pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
                 storage: new index_1.MigratorTypeormStorage(connectionOptions),
-                context: {
-                    connection,
-                },
             });
             // extract results
             const { pendingMigrations, chosenMigrations, performedMigrations, failedMigrations } = result;

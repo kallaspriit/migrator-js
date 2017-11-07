@@ -3,6 +3,7 @@ import * as inquirer from 'inquirer';
 import * as Listr from 'listr';
 import * as path from 'path';
 import * as naturalSort from 'string-natural-compare';
+import {ConnectionOptions} from 'typeorm';
 import {
 	IMigration,
 	IMigrationResult,
@@ -11,6 +12,7 @@ import {
 	MigrationExecutorFn,
 	MigrationStatus,
 } from './common';
+import MigratorTypeormStorage from './storage/typeorm';
 
 export {default as MigratorTypeormStorage} from './storage/typeorm';
 export {ConnectionOptions, Connection, createConnection} from 'typeorm';
@@ -66,11 +68,38 @@ export class Migration<Context> implements IMigration {
 			}
 		});
 	}
+
+	public toJSON(): IMigration {
+		return {
+			name: this.name,
+			filename: this.filename,
+			status: this.status,
+			timeTaken: this.timeTaken,
+			startDate: this.startDate,
+			endDate: this.endDate,
+			result: this.result,
+		};
+	}
 }
 
 // tslint:disable-next-line:max-classes-per-file
-export default class Migrator<T> {
-	constructor(protected options: IMigratorOptions<T>) {}
+export class Migrator<Context> {
+	protected options: IMigratorOptions;
+
+	constructor(protected context: Context, userOptions: Partial<IMigratorOptions>) {
+		const connectionOptions: ConnectionOptions = {
+			type: 'sqlite',
+			name: `migrator`,
+			database: `migrator.sqlite3`,
+		};
+
+		this.options = {
+			pattern: path.join(__dirname, '..', '..', 'src', 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
+			storage: new MigratorTypeormStorage(connectionOptions),
+			autorunAll: false,
+			...userOptions,
+		};
+	}
 
 	public async getMigrationFilenames(): Promise<string[]> {
 		return new Promise<string[]>((resolve, reject) => {
@@ -91,7 +120,7 @@ export default class Migrator<T> {
 		return this.options.storage.getPerformedMigrations();
 	}
 
-	public async getPendingMigrations(): Promise<Array<Migration<T>>> {
+	public async getPendingMigrations(): Promise<Array<Migration<Context>>> {
 		const migrationFilenames = await this.getMigrationFilenames();
 		const performedMigrations = await this.getPerformedMigrations();
 
@@ -107,7 +136,7 @@ export default class Migrator<T> {
 					new Migration(
 						this.getMigrationName(migrationFilename),
 						migrationFilename,
-						this.options.context,
+						this.context,
 						this.options.storage,
 					),
 			);
@@ -118,9 +147,12 @@ export default class Migrator<T> {
 	}
 }
 
-export async function migrate<Context>(options: IMigratorOptions<Context>): Promise<IMigrationResult> {
+export default async function migrate<Context>(
+	context: Context,
+	options: Partial<IMigratorOptions>,
+): Promise<IMigrationResult> {
 	return new Promise<IMigrationResult>(async (resolve, _reject) => {
-		const migrator = new Migrator<Context>(options);
+		const migrator = new Migrator(context, options);
 		const pendingMigrations = await migrator.getPendingMigrations();
 
 		if (pendingMigrations.length === 0) {
@@ -134,19 +166,27 @@ export async function migrate<Context>(options: IMigratorOptions<Context>): Prom
 			return;
 		}
 
-		const choiceResult = await inquirer.prompt([
-			{
-				type: 'checkbox',
-				name: 'chosenMigrations',
-				message: 'Choose migrations to execute',
-				choices: pendingMigrations.map(pendingMigration => ({
-					name: pendingMigration.name,
-					value: pendingMigration.filename,
-				})),
-			},
-		]);
+		let chosenMigrationFilenames: string[] = [];
 
-		const chosenMigrationFilenames: string[] = choiceResult.chosenMigrations;
+		/* istanbul ignore else  */
+		if (options.autorunAll) {
+			chosenMigrationFilenames = pendingMigrations.map(pendingMigration => pendingMigration.filename);
+		} else {
+			// this is very hard to test
+			const choiceResult = await inquirer.prompt([
+				{
+					type: 'checkbox',
+					name: 'chosenMigrations',
+					message: 'Choose migrations to execute',
+					choices: pendingMigrations.map(pendingMigration => ({
+						name: pendingMigration.name,
+						value: pendingMigration.filename,
+					})),
+				},
+			]);
+			chosenMigrationFilenames = choiceResult.chosenMigrations;
+		}
+
 		const chosenMigrations = pendingMigrations.filter(
 			pendingMigration => chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1,
 		);

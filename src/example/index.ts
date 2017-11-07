@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import * as path from 'path';
-import {Connection, ConnectionOptions, createConnection, migrate, MigratorTypeormStorage} from '../index';
+import migrate, {Connection, ConnectionOptions, createConnection, MigratorTypeormStorage} from '../index';
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
 
@@ -27,13 +27,15 @@ async function run() {
 	// attempt to run the migrator
 	try {
 		// run migrator providing pattern of migration files, storage to use and context to pass to each migration
-		const result = await migrate<IMigrationContext>({
-			pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
-			storage: new MigratorTypeormStorage(connectionOptions),
-			context: {
+		const result = await migrate<IMigrationContext>(
+			{
 				connection,
 			},
-		});
+			{
+				pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
+				storage: new MigratorTypeormStorage(connectionOptions),
+			},
+		);
 
 		// extract results
 		const {pendingMigrations, chosenMigrations, performedMigrations, failedMigrations} = result;

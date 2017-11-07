@@ -14,13 +14,15 @@ export declare class Migration<Context> implements IMigration {
     endDate?: Date;
     constructor(name: string, filename: string, context: Context, storage: IMigrationStorage);
     run(): Promise<string>;
+    toJSON(): IMigration;
 }
-export default class Migrator<T> {
-    protected options: IMigratorOptions<T>;
-    constructor(options: IMigratorOptions<T>);
+export declare class Migrator<Context> {
+    protected context: Context;
+    protected options: IMigratorOptions;
+    constructor(context: Context, userOptions: Partial<IMigratorOptions>);
     getMigrationFilenames(): Promise<string[]>;
     getPerformedMigrations(): Promise<IMigration[]>;
-    getPendingMigrations(): Promise<Array<Migration<T>>>;
+    getPendingMigrations(): Promise<Array<Migration<Context>>>;
     protected getMigrationName(migrationFilename: string): string;
 }
-export declare function migrate<Context>(options: IMigratorOptions<Context>): Promise<IMigrationResult>;
+export default function migrate<Context>(context: Context, options: Partial<IMigratorOptions>): Promise<IMigrationResult>;

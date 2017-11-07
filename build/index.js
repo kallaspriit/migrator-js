@@ -14,11 +14,12 @@ const Listr = require("listr");
 const path = require("path");
 const naturalSort = require("string-natural-compare");
 const common_1 = require("./common");
-var typeorm_1 = require("./storage/typeorm");
-exports.MigratorTypeormStorage = typeorm_1.default;
-var typeorm_2 = require("typeorm");
-exports.Connection = typeorm_2.Connection;
-exports.createConnection = typeorm_2.createConnection;
+const typeorm_1 = require("./storage/typeorm");
+var typeorm_2 = require("./storage/typeorm");
+exports.MigratorTypeormStorage = typeorm_2.default;
+var typeorm_3 = require("typeorm");
+exports.Connection = typeorm_3.Connection;
+exports.createConnection = typeorm_3.createConnection;
 var common_2 = require("./common");
 exports.MigrationStatus = common_2.MigrationStatus;
 class Migration {
@@ -54,12 +55,29 @@ class Migration {
             }));
         });
     }
+    toJSON() {
+        return {
+            name: this.name,
+            filename: this.filename,
+            status: this.status,
+            timeTaken: this.timeTaken,
+            startDate: this.startDate,
+            endDate: this.endDate,
+            result: this.result,
+        };
+    }
 }
 exports.Migration = Migration;
 // tslint:disable-next-line:max-classes-per-file
 class Migrator {
-    constructor(options) {
-        this.options = options;
+    constructor(context, userOptions) {
+        this.context = context;
+        const connectionOptions = {
+            type: 'sqlite',
+            name: `migrator`,
+            database: `migrator.sqlite3`,
+        };
+        this.options = Object.assign({ pattern: path.join(__dirname, '..', '..', 'src', 'migrations', '!(*.spec|*.test|*.d).{ts,js}'), storage: new typeorm_1.default(connectionOptions), autorunAll: false }, userOptions);
     }
     getMigrationFilenames() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -86,18 +104,18 @@ class Migrator {
             const performedMigrations = yield this.getPerformedMigrations();
             return migrationFilenames
                 .filter(migrationFilename => performedMigrations.find(performedMigration => performedMigration.name === this.getMigrationName(migrationFilename)) === undefined)
-                .map(migrationFilename => new Migration(this.getMigrationName(migrationFilename), migrationFilename, this.options.context, this.options.storage));
+                .map(migrationFilename => new Migration(this.getMigrationName(migrationFilename), migrationFilename, this.context, this.options.storage));
         });
     }
     getMigrationName(migrationFilename) {
         return path.basename(migrationFilename, '.js');
     }
 }
-exports.default = Migrator;
-function migrate(options) {
+exports.Migrator = Migrator;
+function migrate(context, options) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, _reject) => __awaiter(this, void 0, void 0, function* () {
-            const migrator = new Migrator(options);
+            const migrator = new Migrator(context, options);
             const pendingMigrations = yield migrator.getPendingMigrations();
             if (pendingMigrations.length === 0) {
                 resolve({
@@ -151,5 +169,5 @@ function migrate(options) {
         }));
     });
 }
-exports.migrate = migrate;
+exports.default = migrate;
 //# sourceMappingURL=index.js.map

@@ -11,28 +11,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const _1 = require("../");
 let migratorCount = 0;
+const connectionOptions = {
+    type: 'sqlite',
+    name: `migrator-test-${++migratorCount}`,
+    database: `migrate-${Date.now()}.sqlite3`,
+};
+const migratorOptions = {
+    pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
+    storage: new _1.MigratorTypeormStorage(connectionOptions),
+    autorunAll: false,
+};
 function setupMigrator() {
     return __awaiter(this, void 0, void 0, function* () {
-        const connectionOptions = {
-            type: 'sqlite',
-            name: `migrator-test-${++migratorCount}`,
-            database: `migrate-${Date.now()}.sqlite3`,
-        };
         const connection = yield _1.createConnection(connectionOptions);
-        return new _1.default({
-            pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
-            storage: new _1.MigratorTypeormStorage(connectionOptions),
-            context: {
-                connection,
-            },
-        });
+        return new _1.Migrator({
+            connection,
+        }, migratorOptions);
     });
 }
 function preprocessSnapshot(migration) {
+    const info = migration.toJSON();
     return {
-        name: migration.name,
-        status: migration.status,
-        result: migration.result,
+        name: info.name,
+        status: info.status,
+        result: info.result,
     };
 }
 describe('migrator-js', () => {
@@ -58,5 +60,9 @@ describe('migrator-js', () => {
         const pendingMigrations2 = yield migrator.getPendingMigrations();
         expect(pendingMigrations2).toHaveLength(2);
     }));
+    // it('provides interactive migrator', async () => {
+    // 	const results = await migrate<IMigrationContext>(migratorOptions);
+    // 	expect(results).toMatchSnapshot();
+    // });
 });
 //# sourceMappingURL=index.test.js.map

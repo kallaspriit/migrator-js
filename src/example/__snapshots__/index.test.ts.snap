@@ -1,5 +1,87 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`migrator-js handles empty list of pending migrations 1`] = `
+Object {
+  "chosenMigrations": Array [],
+  "failedMigrations": Array [],
+  "pendingMigrations": Array [],
+  "performedMigrations": Array [],
+}
+`;
+
+exports[`migrator-js provides interactive migrator 1`] = `
+Object {
+  "chosenMigrations": Array [
+    Object {
+      "name": "001-test-migration.ts",
+      "result": "[{\\"sum\\":2}]",
+      "status": "COMPLETE",
+    },
+    Object {
+      "name": "002-fail-example.ts",
+      "result": "Example failure message",
+      "status": "FAILED",
+    },
+  ],
+  "failedMigrations": Array [
+    Object {
+      "name": "002-fail-example.ts",
+      "result": "Example failure message",
+      "status": "FAILED",
+    },
+  ],
+  "pendingMigrations": Array [
+    Object {
+      "name": "001-test-migration.ts",
+      "result": "[{\\"sum\\":2}]",
+      "status": "COMPLETE",
+    },
+    Object {
+      "name": "002-fail-example.ts",
+      "result": "Example failure message",
+      "status": "FAILED",
+    },
+  ],
+  "performedMigrations": Array [
+    Object {
+      "name": "001-test-migration.ts",
+      "result": "[{\\"sum\\":2}]",
+      "status": "COMPLETE",
+    },
+  ],
+}
+`;
+
+exports[`migrator-js should handle failing migration 1`] = `
+Array [
+  Object {
+    "name": "001-test-migration.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+  Object {
+    "name": "002-fail-example.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+]
+`;
+
+exports[`migrator-js should handle failing migration 2`] = `
+Array [
+  Object {
+    "name": "001-test-migration.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+  Object {
+    "name": "002-fail-example.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+]
+`;
+
 exports[`migrator-js should provide list of pending migrations 1`] = `
 Array [
   Object {
@@ -15,4 +97,29 @@ Array [
 ]
 `;
 
-exports[`migrator-js should run a single migration 1`] = `"[{\\"sum\\":2}]"`;
+exports[`migrator-js should run a single migration 1`] = `
+Array [
+  Object {
+    "name": "001-test-migration.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+  Object {
+    "name": "002-fail-example.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+]
+`;
+
+exports[`migrator-js should run a single migration 2`] = `"[{\\"sum\\":2}]"`;
+
+exports[`migrator-js should run a single migration 3`] = `
+Array [
+  Object {
+    "name": "002-fail-example.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+]
+`;
