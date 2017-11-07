@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import * as path from 'path';
-import {Connection, createConnection} from 'typeorm';
-import {ConnectionOptions, migrate, MigratorTypeormStorage} from '../index';
+import {Connection, ConnectionOptions, createConnection, migrate, MigratorTypeormStorage} from '../index';
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
 

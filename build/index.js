@@ -16,6 +16,9 @@ const naturalSort = require("string-natural-compare");
 const common_1 = require("./common");
 var typeorm_1 = require("./storage/typeorm");
 exports.MigratorTypeormStorage = typeorm_1.default;
+var typeorm_2 = require("typeorm");
+exports.Connection = typeorm_2.Connection;
+exports.createConnection = typeorm_2.createConnection;
 var common_2 = require("./common");
 exports.MigrationStatus = common_2.MigrationStatus;
 class Migration {
@@ -51,17 +54,6 @@ class Migration {
             }));
         });
     }
-    toJSON() {
-        return {
-            name: this.name,
-            filename: this.filename,
-            status: this.status,
-            timeTaken: this.timeTaken,
-            startDate: this.startDate,
-            endDate: this.endDate,
-            result: this.result,
-        };
-    }
 }
 exports.Migration = Migration;
 // tslint:disable-next-line:max-classes-per-file
@@ -73,6 +65,7 @@ class Migrator {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 glob(this.options.pattern, (error, filenames) => {
+                    /* istanbul ignore if */
                     if (error) {
                         reject(error);
                         return;

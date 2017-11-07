@@ -1,6 +1,6 @@
 import { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationStatus } from './common';
 export { default as MigratorTypeormStorage } from './storage/typeorm';
-export { ConnectionOptions } from 'typeorm';
+export { ConnectionOptions, Connection, createConnection } from 'typeorm';
 export { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationExecutorFn, MigrationStatus } from './common';
 export declare class Migration<Context> implements IMigration {
     name: string;
@@ -14,7 +14,6 @@ export declare class Migration<Context> implements IMigration {
     endDate?: Date;
     constructor(name: string, filename: string, context: Context, storage: IMigrationStorage);
     run(): Promise<string>;
-    toJSON(): IMigration;
 }
 export default class Migrator<T> {
     protected options: IMigratorOptions<T>;

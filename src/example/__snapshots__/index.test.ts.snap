@@ -14,3 +14,5 @@ Array [
   },
 ]
 `;
+
+exports[`migrator-js should run a single migration 1`] = `"[{\\"sum\\":2}]"`;

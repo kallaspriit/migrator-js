@@ -13,7 +13,7 @@ import {
 } from './common';
 
 export {default as MigratorTypeormStorage} from './storage/typeorm';
-export {ConnectionOptions} from 'typeorm';
+export {ConnectionOptions, Connection, createConnection} from 'typeorm';
 export {
 	IMigration,
 	IMigrationResult,
@@ -66,18 +66,6 @@ export class Migration<Context> implements IMigration {
 			}
 		});
 	}
-
-	public toJSON(): IMigration {
-		return {
-			name: this.name,
-			filename: this.filename,
-			status: this.status,
-			timeTaken: this.timeTaken,
-			startDate: this.startDate,
-			endDate: this.endDate,
-			result: this.result,
-		};
-	}
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -87,6 +75,7 @@ export default class Migrator<T> {
 	public async getMigrationFilenames(): Promise<string[]> {
 		return new Promise<string[]>((resolve, reject) => {
 			glob(this.options.pattern, (error, filenames) => {
+				/* istanbul ignore if */
 				if (error) {
 					reject(error);
 

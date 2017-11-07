@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = require("chalk");
 const path = require("path");
-const typeorm_1 = require("typeorm");
 const index_1 = require("../index");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -20,7 +19,7 @@ function run() {
             type: 'sqlite',
             database: path.join(__dirname, '..', '..', 'migrate.sqlite3'),
         };
-        const connection = yield typeorm_1.createConnection(connectionOptions);
+        const connection = yield index_1.createConnection(connectionOptions);
         // show an empty line between previous content
         console.log('');
         // notify of the location of the test database
