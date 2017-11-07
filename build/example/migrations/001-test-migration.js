@@ -9,8 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = (context) => __awaiter(this, void 0, void 0, function* () {
-    // run any query, crop images etc
-    const sum = yield context.connection.query('SELECT 1+1 AS sum');
-    return `1+1=${sum}`;
+    return `version: ${context.version}`;
 });
 //# sourceMappingURL=001-test-migration.js.map

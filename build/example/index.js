@@ -13,25 +13,22 @@ const path = require("path");
 const index_1 = require("../index");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
-        // see http://typeorm.io
-        const connectionOptions = {
-            type: 'sqlite',
-            database: path.join(__dirname, '..', '..', 'migrate.sqlite3'),
-        };
-        const connection = yield index_1.createConnection(connectionOptions);
         // show an empty line between previous content
         console.log('');
-        // notify of the location of the test database
-        console.log(`Using ${connectionOptions.type} database at ${chalk_1.default.reset.bold(connectionOptions.database)}`);
         // attempt to run the migrator
         try {
             // run migrator providing pattern of migration files, storage to use and context to pass to each migration
             const result = yield index_1.default({
-                connection,
+                version: '1',
             }, {
+                // pattern for finding the migration scripts
                 pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
-                storage: new index_1.MigratorTypeormStorage(connectionOptions),
+                // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
+                // see http://typeorm.io
+                storage: new index_1.MigratorTypeormStorage({
+                    type: 'sqlite',
+                    database: path.join(__dirname, '..', '..', 'migrate.sqlite3'),
+                }),
             });
             // extract results
             const { pendingMigrations, chosenMigrations, performedMigrations, failedMigrations } = result;
@@ -61,9 +58,6 @@ function run() {
         }
         catch (e) {
             console.error(`${chalk_1.default.black.bgRed(` RUNNING MIGRATOR FAILED `)}`, e.stack);
-        }
-        finally {
-            yield connection.close();
         }
     });
 }

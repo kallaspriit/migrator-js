@@ -8,9 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const del = require("del");
 const path = require("path");
 const _1 = require("../");
 let migratorCount = 0;
+const context = {
+    version: '1',
+};
 function getConnectionOptions() {
     return {
         type: 'sqlite',
@@ -27,10 +31,7 @@ function getMigratorOptions() {
 }
 function setupMigrator() {
     return __awaiter(this, void 0, void 0, function* () {
-        const connection = yield _1.createConnection(getConnectionOptions());
-        return new _1.Migrator({
-            connection,
-        }, getMigratorOptions());
+        return new _1.Migrator(context, getMigratorOptions());
     });
 }
 function preprocessSnapshot(migration) {
@@ -41,6 +42,10 @@ function preprocessSnapshot(migration) {
     };
 }
 describe('migrator-js', () => {
+    // delete generated sqlite databases
+    afterEach(() => __awaiter(this, void 0, void 0, function* () {
+        yield del([path.join(__dirname, '..', '..', `*.sqlite3`)]);
+    }));
     it('should provide list of pending migrations', () => __awaiter(this, void 0, void 0, function* () {
         const migrator = yield setupMigrator();
         const pendingMigrations = yield migrator.getPendingMigrations();
@@ -69,10 +74,7 @@ describe('migrator-js', () => {
         expect(pendingMigrations2.map(preprocessSnapshot)).toMatchSnapshot();
     }));
     it('provides interactive migrator', () => __awaiter(this, void 0, void 0, function* () {
-        const connection = yield _1.createConnection(getConnectionOptions());
-        const results = yield _1.default({
-            connection,
-        }, Object.assign({}, getMigratorOptions(), { autorunAll: true }));
+        const results = yield _1.default(context, Object.assign({}, getMigratorOptions(), { autorunAll: true }));
         expect({
             pendingMigrations: results.pendingMigrations.map(preprocessSnapshot),
             chosenMigrations: results.chosenMigrations.map(preprocessSnapshot),
@@ -81,10 +83,7 @@ describe('migrator-js', () => {
         }).toMatchSnapshot();
     }));
     it('handles empty list of pending migrations', () => __awaiter(this, void 0, void 0, function* () {
-        const connection = yield _1.createConnection(getConnectionOptions());
-        const results = yield _1.default({
-            connection,
-        }, Object.assign({}, getMigratorOptions(), { autorunAll: true, pattern: 'xxx' }));
+        const results = yield _1.default(context, Object.assign({}, getMigratorOptions(), { autorunAll: true, pattern: 'xxx' }));
         expect({
             pendingMigrations: results.pendingMigrations.map(preprocessSnapshot),
             chosenMigrations: results.chosenMigrations.map(preprocessSnapshot),

@@ -1,8 +1,7 @@
+import * as del from 'del';
 import * as path from 'path';
 import migrate, {
-	Connection,
 	ConnectionOptions,
-	createConnection,
 	IMigration,
 	IMigratorOptions,
 	MigrationStatus,
@@ -11,7 +10,7 @@ import migrate, {
 } from '../';
 
 interface IMigrationContext {
-	connection: Connection;
+	version: string;
 }
 
 interface IMigrationSnapshot {
@@ -21,6 +20,9 @@ interface IMigrationSnapshot {
 }
 
 let migratorCount = 0;
+const context = {
+	version: '1',
+};
 
 function getConnectionOptions(): ConnectionOptions {
 	return {
@@ -39,14 +41,7 @@ function getMigratorOptions(): IMigratorOptions {
 }
 
 async function setupMigrator(): Promise<Migrator<IMigrationContext>> {
-	const connection = await createConnection(getConnectionOptions());
-
-	return new Migrator<IMigrationContext>(
-		{
-			connection,
-		},
-		getMigratorOptions(),
-	);
+	return new Migrator<IMigrationContext>(context, getMigratorOptions());
 }
 
 function preprocessSnapshot(migration: IMigration): IMigrationSnapshot {
@@ -58,6 +53,11 @@ function preprocessSnapshot(migration: IMigration): IMigrationSnapshot {
 }
 
 describe('migrator-js', () => {
+	// delete generated sqlite databases
+	afterEach(async () => {
+		await del([path.join(__dirname, '..', '..', `*.sqlite3`)]);
+	});
+
 	it('should provide list of pending migrations', async () => {
 		const migrator = await setupMigrator();
 		const pendingMigrations = await migrator.getPendingMigrations();
@@ -93,16 +93,10 @@ describe('migrator-js', () => {
 	});
 
 	it('provides interactive migrator', async () => {
-		const connection = await createConnection(getConnectionOptions());
-		const results = await migrate<IMigrationContext>(
-			{
-				connection,
-			},
-			{
-				...getMigratorOptions(),
-				autorunAll: true,
-			},
-		);
+		const results = await migrate<IMigrationContext>(context, {
+			...getMigratorOptions(),
+			autorunAll: true,
+		});
 
 		expect({
 			pendingMigrations: results.pendingMigrations.map(preprocessSnapshot),
@@ -113,17 +107,11 @@ describe('migrator-js', () => {
 	});
 
 	it('handles empty list of pending migrations', async () => {
-		const connection = await createConnection(getConnectionOptions());
-		const results = await migrate<IMigrationContext>(
-			{
-				connection,
-			},
-			{
-				...getMigratorOptions(),
-				autorunAll: true,
-				pattern: 'xxx', // won't find any migrations
-			},
-		);
+		const results = await migrate<IMigrationContext>(context, {
+			...getMigratorOptions(),
+			autorunAll: true,
+			pattern: 'xxx', // won't find any migrations
+		});
 
 		expect({
 			pendingMigrations: results.pendingMigrations.map(preprocessSnapshot),

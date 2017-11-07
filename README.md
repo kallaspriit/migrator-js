@@ -29,7 +29,7 @@ npm install migrator-js
 - `yarn build` to build the production version.
 - `yarn test` to run tests.
 - `yarn lint` to lint the codebase.
-- `yarn start` to start the example application.
+- `yarn migrate` to run the the example migration script.
 - `yarn coverage` to gather code coverage.
 - `yarn prettier` to run prettier.
 
@@ -41,55 +41,66 @@ npm install migrator-js
 
 See `src/example` directory for a full working example code and run `npm start` to try it out for yourself.
 
-**Example migration**
+**Example migration script**
 ```javascript
 import {IMigrationContext} from '../';
 
 export default async (context: IMigrationContext): Promise<string> => {
-	// run any query, crop images etc
-	const sum = await context.connection.query('SELECT 1+1 AS sum');
+  // run any query, crop images etc
+  const sum = await context.connection.query('SELECT 1+1 AS sum');
 
-	return `1+1=${sum}`;
+  return `1+1=${sum}`;
 };
 ```
 
 **Example script that runs chosen migrations**
+Store it in `src/scripts/migrate.ts` etc and add NPM script to run it.
+
+`package.json`
+```json
+{
+  "scripts": {
+    "migrate": "yarn build && node build/example"
+  }
+}
+```
+
+`src/scripts/migrate.ts`
 ```javascript
 import chalk from 'chalk';
 import * as path from 'path';
-import {Connection, ConnectionOptions, createConnection} from 'typeorm';
-import {migrate} from '../';
-import MigratorTypeormStorage from '../storage/typeorm';
+import migrate, {MigratorTypeormStorage} from '../index';
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
 
 // any context resources passed on to all migrations
 export interface IMigrationContext {
-  connection: Connection;
+  version: string;
 }
 
 async function run() {
-  // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
-  // see http://typeorm.io
-  const connectionOptions: ConnectionOptions = {
-    type: 'sqlite',
-    database: path.join(__dirname, '..', '..', 'example-database.sqlite3'),
-  };
-  const connection = await createConnection(connectionOptions);
-
-  // notify of the location of the test database
-  console.log(`Using SQLITE3 database at ${chalk.reset.bold(connectionOptions.database)}, delete it to try again`);
+  // show an empty line between previous content
+  console.log('');
 
   // attempt to run the migrator
   try {
     // run migrator providing pattern of migration files, storage to use and context to pass to each migration
-    const result = await migrate<IMigrationContext>({
-      pattern: path.join(__dirname, 'migrations', '*.js'),
-      storage: new MigratorTypeormStorage(connectionOptions),
-      context: {
-        connection,
+    const result = await migrate<IMigrationContext>(
+      {
+        version: '1',
       },
-    });
+      {
+        // pattern for finding the migration scripts
+        pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
+
+        // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
+        // see http://typeorm.io
+        storage: new MigratorTypeormStorage({
+          type: 'sqlite',
+          database: path.join(__dirname, '..', '..', 'migrate.sqlite3'),
+        }),
+      },
+    );
 
     // extract results
     const {pendingMigrations, chosenMigrations, performedMigrations, failedMigrations} = result;
@@ -119,8 +130,6 @@ async function run() {
     }
   } catch (e) {
     console.error(`${chalk.black.bgRed(` RUNNING MIGRATOR FAILED `)}`, e.stack);
-  } finally {
-    await connection.close();
   }
 }
 
