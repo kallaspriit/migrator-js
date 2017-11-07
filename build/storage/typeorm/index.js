@@ -58,38 +58,59 @@ class MigratorTypeormStorage {
     getPerformedMigrations() {
         return __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.getConnection();
-            const performedMigrations = connection.getRepository(Migration).find({
-                where: {
-                    status: common_1.MigrationStatus.COMPLETE,
-                },
-            });
-            yield connection.close();
-            return performedMigrations;
+            try {
+                return connection.getRepository(Migration).find({
+                    where: {
+                        status: common_1.MigrationStatus.COMPLETE,
+                    },
+                });
+            }
+            catch (e) {
+                console.error('Fetching performed migrations failed', e.stack);
+                return [];
+            }
+            finally {
+                yield connection.close();
+            }
         });
     }
     insertMigration(name) {
         return __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.getConnection();
-            connection.getRepository(Migration).save({
-                name,
-                status: common_1.MigrationStatus.RUNNING,
-            });
-            yield connection.close();
+            try {
+                connection.getRepository(Migration).save({
+                    name,
+                    status: common_1.MigrationStatus.RUNNING,
+                });
+            }
+            catch (e) {
+                console.error('Inserting migration failed', e.stack);
+            }
+            finally {
+                yield connection.close();
+            }
         });
     }
     updateMigration(name, status, result, timeTaken) {
         return __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.getConnection();
-            const repository = connection.getRepository(Migration);
-            const migration = yield repository.findOneById(name);
-            if (!migration) {
-                throw new Error(`Migration called "${name}" was not found`);
+            try {
+                const repository = connection.getRepository(Migration);
+                const migration = yield repository.findOneById(name);
+                if (!migration) {
+                    throw new Error(`Migration called "${name}" was not found`);
+                }
+                migration.status = status;
+                migration.result = result;
+                migration.timeTaken = timeTaken;
+                repository.save(migration);
             }
-            migration.status = status;
-            migration.result = result;
-            migration.timeTaken = timeTaken;
-            repository.save(migration);
-            yield connection.close();
+            catch (e) {
+                console.error('Updating migration failed', e.stack);
+            }
+            finally {
+                yield connection.close();
+            }
         });
     }
     getConnection() {

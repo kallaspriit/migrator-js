@@ -42,26 +42,34 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 	public async getPerformedMigrations(): Promise<IMigrationInfo[]> {
 		const connection = await this.getConnection();
 
-		const performedMigrations = connection.getRepository(Migration).find({
-			where: {
-				status: MigrationStatus.COMPLETE,
-			},
-		});
+		try {
+			return connection.getRepository(Migration).find({
+				where: {
+					status: MigrationStatus.COMPLETE,
+				},
+			});
+		} catch (e) {
+			console.error('Fetching performed migrations failed', e.stack);
 
-		await connection.close();
-
-		return performedMigrations;
+			return [];
+		} finally {
+			await connection.close();
+		}
 	}
 
 	public async insertMigration(name: string): Promise<void> {
 		const connection = await this.getConnection();
 
-		connection.getRepository(Migration).save({
-			name,
-			status: MigrationStatus.RUNNING,
-		});
-
-		await connection.close();
+		try {
+			connection.getRepository(Migration).save({
+				name,
+				status: MigrationStatus.RUNNING,
+			});
+		} catch (e) {
+			console.error('Inserting migration failed', e.stack);
+		} finally {
+			await connection.close();
+		}
 	}
 
 	public async updateMigration(
@@ -71,20 +79,25 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 		timeTaken: number,
 	): Promise<void> {
 		const connection = await this.getConnection();
-		const repository = connection.getRepository(Migration);
-		const migration = await repository.findOneById(name);
 
-		if (!migration) {
-			throw new Error(`Migration called "${name}" was not found`);
+		try {
+			const repository = connection.getRepository(Migration);
+			const migration = await repository.findOneById(name);
+
+			if (!migration) {
+				throw new Error(`Migration called "${name}" was not found`);
+			}
+
+			migration.status = status;
+			migration.result = result;
+			migration.timeTaken = timeTaken;
+
+			repository.save(migration);
+		} catch (e) {
+			console.error('Updating migration failed', e.stack);
+		} finally {
+			await connection.close();
 		}
-
-		migration.status = status;
-		migration.result = result;
-		migration.timeTaken = timeTaken;
-
-		repository.save(migration);
-
-		await connection.close();
 	}
 
 	protected async getConnection(): Promise<Connection> {
