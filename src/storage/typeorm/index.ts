@@ -44,15 +44,12 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 
 		try {
 			const repository = connection.getRepository(Migration);
-			const migrations = await repository.find({
+
+			return await repository.find({
 				where: {
 					status: MigrationStatus.COMPLETE,
 				},
 			});
-
-			console.log('migrations', migrations);
-
-			return migrations;
 		} catch (e) {
 			console.error('Fetching performed migrations failed', e.stack);
 
@@ -66,7 +63,9 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 		const connection = await this.getConnection();
 
 		try {
-			connection.getRepository(Migration).save({
+			const repository = connection.getRepository(Migration);
+
+			await repository.save({
 				name,
 				status: MigrationStatus.RUNNING,
 			});
@@ -97,7 +96,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 			migration.result = result;
 			migration.timeTaken = timeTaken;
 
-			repository.save(migration);
+			await repository.save(migration);
 		} catch (e) {
 			console.error('Updating migration failed', e.stack);
 		} finally {

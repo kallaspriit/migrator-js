@@ -60,13 +60,11 @@ class MigratorTypeormStorage {
             const connection = yield this.getConnection();
             try {
                 const repository = connection.getRepository(Migration);
-                const migrations = yield repository.find({
+                return yield repository.find({
                     where: {
                         status: common_1.MigrationStatus.COMPLETE,
                     },
                 });
-                console.log('migrations', migrations);
-                return migrations;
             }
             catch (e) {
                 console.error('Fetching performed migrations failed', e.stack);
@@ -81,7 +79,8 @@ class MigratorTypeormStorage {
         return __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.getConnection();
             try {
-                connection.getRepository(Migration).save({
+                const repository = connection.getRepository(Migration);
+                yield repository.save({
                     name,
                     status: common_1.MigrationStatus.RUNNING,
                 });
@@ -106,7 +105,7 @@ class MigratorTypeormStorage {
                 migration.status = status;
                 migration.result = result;
                 migration.timeTaken = timeTaken;
-                repository.save(migration);
+                yield repository.save(migration);
             }
             catch (e) {
                 console.error('Updating migration failed', e.stack);
