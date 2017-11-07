@@ -5,7 +5,6 @@ import * as path from 'path';
 import * as naturalSort from 'string-natural-compare';
 import {
 	IMigration,
-	IMigrationInfo,
 	IMigrationResult,
 	IMigrationStorage,
 	IMigratorOptions,
@@ -14,31 +13,42 @@ import {
 } from './common';
 
 export {default as MigratorTypeormStorage} from './storage/typeorm';
+export {ConnectionOptions} from 'typeorm';
+export {
+	IMigration,
+	IMigrationResult,
+	IMigrationStorage,
+	IMigratorOptions,
+	MigrationExecutorFn,
+	MigrationStatus,
+} from './common';
 
 export class Migration<Context> implements IMigration {
-	public timeTaken: number = 0;
-	public result?: string;
 	public status = MigrationStatus.PENDING;
+	public timeTaken?: number;
+	public result?: string;
+	public startDate?: Date;
+	public endDate?: Date;
 
 	constructor(
 		public name: string,
 		public filename: string,
-		public context: Context,
-		public storage: IMigrationStorage,
+		protected context: Context,
+		protected storage: IMigrationStorage,
 	) {}
 
 	public async run(): Promise<string> {
 		return new Promise<string>(async (resolve, reject) => {
 			const migration: MigrationExecutorFn<Context> = require(this.filename).default;
 
-			let startTime: number = Date.now();
+			await this.storage.insertMigration(this.name, this.filename);
 
-			await this.storage.insertMigration(this.name);
+			this.startDate = new Date();
 
 			try {
-				startTime = Date.now();
 				this.result = await migration(this.context);
-				this.timeTaken = Date.now() - startTime;
+				this.endDate = new Date();
+				this.timeTaken = this.endDate.getTime() - this.startDate.getTime();
 				this.status = MigrationStatus.COMPLETE;
 
 				await this.storage.updateMigration(this.name, this.status, this.result, this.timeTaken);
@@ -46,7 +56,8 @@ export class Migration<Context> implements IMigration {
 				resolve(this.result);
 			} catch (e) {
 				this.result = e.message;
-				this.timeTaken = Date.now() - startTime;
+				this.endDate = new Date();
+				this.timeTaken = this.endDate.getTime() - this.startDate.getTime();
 				this.status = MigrationStatus.FAILED;
 
 				await this.storage.updateMigration(this.name, this.status, e.stack, this.timeTaken);
@@ -54,6 +65,18 @@ export class Migration<Context> implements IMigration {
 				reject(e);
 			}
 		});
+	}
+
+	public toJSON(): IMigration {
+		return {
+			name: this.name,
+			filename: this.filename,
+			status: this.status,
+			timeTaken: this.timeTaken,
+			startDate: this.startDate,
+			endDate: this.endDate,
+			result: this.result,
+		};
 	}
 }
 
@@ -75,7 +98,7 @@ export default class Migrator<T> {
 		});
 	}
 
-	public async getPerformedMigrations(): Promise<IMigrationInfo[]> {
+	public async getPerformedMigrations(): Promise<IMigration[]> {
 		return this.options.storage.getPerformedMigrations();
 	}
 

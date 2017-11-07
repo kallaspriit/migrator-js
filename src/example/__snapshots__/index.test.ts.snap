@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`migrator-js should provide list of pending migrations 1`] = `
+Array [
+  Object {
+    "name": "001-test-migration.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+  Object {
+    "name": "002-fail-example.ts",
+    "result": undefined,
+    "status": "PENDING",
+  },
+]
+`;

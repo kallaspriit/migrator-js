@@ -5,18 +5,19 @@ export enum MigrationStatus {
 	FAILED = 'FAILED',
 }
 
-export interface IMigrationInfo {
+export interface IMigration {
 	name: string;
+	filename: string;
 	status: MigrationStatus;
-	timeTaken: number;
-	result: string;
-	startDate: Date;
-	endDate: Date;
+	timeTaken?: number;
+	startDate?: Date;
+	endDate?: Date;
+	result?: string;
 }
 
 export interface IMigrationStorage {
-	getPerformedMigrations(): Promise<IMigrationInfo[]>;
-	insertMigration(name: string): Promise<void>;
+	getPerformedMigrations(): Promise<IMigration[]>;
+	insertMigration(name: string, filename: string): Promise<void>;
 	updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
 }
 
@@ -26,14 +27,6 @@ export interface IMigratorOptions<Context> {
 	pattern: string;
 	storage: IMigrationStorage;
 	context: Context;
-}
-
-export interface IMigration {
-	timeTaken: number;
-	result?: string;
-	status: MigrationStatus;
-
-	run(): Promise<string>;
 }
 
 export interface IMigrationResult {

@@ -26,6 +26,10 @@ __decorate([
     __metadata("design:type", String)
 ], Migration.prototype, "name", void 0);
 __decorate([
+    typeorm_1.Column({ type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], Migration.prototype, "filename", void 0);
+__decorate([
     typeorm_1.Column({ type: 'varchar', nullable: false, default: common_1.MigrationStatus.RUNNING }),
     __metadata("design:type", String)
 ], Migration.prototype, "status", void 0);
@@ -60,11 +64,12 @@ class MigratorTypeormStorage {
             const connection = yield this.getConnection();
             try {
                 const repository = connection.getRepository(Migration);
-                return yield repository.find({
+                const migrations = yield repository.find({
                     where: {
                         status: common_1.MigrationStatus.COMPLETE,
                     },
                 });
+                return migrations.map(this.getMigrationInfo);
             }
             catch (e) {
                 console.error('Fetching performed migrations failed', e.stack);
@@ -75,13 +80,14 @@ class MigratorTypeormStorage {
             }
         });
     }
-    insertMigration(name) {
+    insertMigration(name, filename) {
         return __awaiter(this, void 0, void 0, function* () {
             const connection = yield this.getConnection();
             try {
                 const repository = connection.getRepository(Migration);
                 yield repository.save({
                     name,
+                    filename,
                     status: common_1.MigrationStatus.RUNNING,
                 });
             }
@@ -123,6 +129,17 @@ class MigratorTypeormStorage {
             }
             return connection;
         });
+    }
+    getMigrationInfo(migration) {
+        return {
+            name: migration.name,
+            filename: migration.filename,
+            status: migration.status,
+            timeTaken: migration.timeTaken,
+            startDate: migration.startDate,
+            endDate: migration.endDate,
+            result: migration.result,
+        };
     }
     resolveStatus(statusName) {
         switch (statusName) {

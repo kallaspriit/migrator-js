@@ -8,7 +8,7 @@ import {
 	PrimaryColumn,
 	UpdateDateColumn,
 } from 'typeorm';
-import {IMigrationInfo, IMigrationStorage, MigrationStatus} from '../../common';
+import {IMigration, IMigrationStorage, MigrationStatus} from '../../common';
 
 export interface IDatabaseResult {
 	[x: string]: string | number;
@@ -18,6 +18,9 @@ export interface IDatabaseResult {
 export class Migration {
 	@PrimaryColumn({type: 'varchar', nullable: false, length: 256})
 	public name: string;
+
+	@Column({type: 'varchar', nullable: true})
+	public filename: string;
 
 	@Column({type: 'varchar', nullable: false, default: MigrationStatus.RUNNING})
 	public status: MigrationStatus;
@@ -39,17 +42,19 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 
 	constructor(protected connectionOptions: ConnectionOptions) {}
 
-	public async getPerformedMigrations(): Promise<IMigrationInfo[]> {
+	public async getPerformedMigrations(): Promise<IMigration[]> {
 		const connection = await this.getConnection();
 
 		try {
 			const repository = connection.getRepository(Migration);
 
-			return await repository.find({
+			const migrations = await repository.find({
 				where: {
 					status: MigrationStatus.COMPLETE,
 				},
 			});
+
+			return migrations.map(this.getMigrationInfo);
 		} catch (e) {
 			console.error('Fetching performed migrations failed', e.stack);
 
@@ -59,7 +64,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 		}
 	}
 
-	public async insertMigration(name: string): Promise<void> {
+	public async insertMigration(name: string, filename: string): Promise<void> {
 		const connection = await this.getConnection();
 
 		try {
@@ -67,6 +72,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 
 			await repository.save({
 				name,
+				filename,
 				status: MigrationStatus.RUNNING,
 			});
 		} catch (e) {
@@ -117,6 +123,18 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 		}
 
 		return connection;
+	}
+
+	protected getMigrationInfo(migration: Migration): IMigration {
+		return {
+			name: migration.name,
+			filename: migration.filename,
+			status: migration.status,
+			timeTaken: migration.timeTaken,
+			startDate: migration.startDate,
+			endDate: migration.endDate,
+			result: migration.result,
+		};
 	}
 
 	protected resolveStatus(statusName: string): MigrationStatus {

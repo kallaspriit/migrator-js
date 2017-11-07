@@ -16,38 +16,51 @@ const naturalSort = require("string-natural-compare");
 const common_1 = require("./common");
 var typeorm_1 = require("./storage/typeorm");
 exports.MigratorTypeormStorage = typeorm_1.default;
+var common_2 = require("./common");
+exports.MigrationStatus = common_2.MigrationStatus;
 class Migration {
     constructor(name, filename, context, storage) {
         this.name = name;
         this.filename = filename;
         this.context = context;
         this.storage = storage;
-        this.timeTaken = 0;
         this.status = common_1.MigrationStatus.PENDING;
     }
     run() {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
                 const migration = require(this.filename).default;
-                let startTime = Date.now();
-                yield this.storage.insertMigration(this.name);
+                yield this.storage.insertMigration(this.name, this.filename);
+                this.startDate = new Date();
                 try {
-                    startTime = Date.now();
                     this.result = yield migration(this.context);
-                    this.timeTaken = Date.now() - startTime;
+                    this.endDate = new Date();
+                    this.timeTaken = this.endDate.getTime() - this.startDate.getTime();
                     this.status = common_1.MigrationStatus.COMPLETE;
                     yield this.storage.updateMigration(this.name, this.status, this.result, this.timeTaken);
                     resolve(this.result);
                 }
                 catch (e) {
                     this.result = e.message;
-                    this.timeTaken = Date.now() - startTime;
+                    this.endDate = new Date();
+                    this.timeTaken = this.endDate.getTime() - this.startDate.getTime();
                     this.status = common_1.MigrationStatus.FAILED;
                     yield this.storage.updateMigration(this.name, this.status, e.stack, this.timeTaken);
                     reject(e);
                 }
             }));
         });
+    }
+    toJSON() {
+        return {
+            name: this.name,
+            filename: this.filename,
+            status: this.status,
+            timeTaken: this.timeTaken,
+            startDate: this.startDate,
+            endDate: this.endDate,
+            result: this.result,
+        };
     }
 }
 exports.Migration = Migration;

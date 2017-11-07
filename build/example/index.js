@@ -12,7 +12,6 @@ const chalk_1 = require("chalk");
 const path = require("path");
 const typeorm_1 = require("typeorm");
 const index_1 = require("../index");
-const typeorm_2 = require("../storage/typeorm");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
@@ -30,8 +29,8 @@ function run() {
         try {
             // run migrator providing pattern of migration files, storage to use and context to pass to each migration
             const result = yield index_1.migrate({
-                pattern: path.join(__dirname, 'migrations', '*.js'),
-                storage: new typeorm_2.default(connectionOptions),
+                pattern: path.join(__dirname, 'migrations', '!(*.spec|*.test|*.d).{ts,js}'),
+                storage: new index_1.MigratorTypeormStorage(connectionOptions),
                 context: {
                     connection,
                 },
