@@ -8,6 +8,8 @@
 
 **Simple extensible one-way migration tool for performing various tasks in order in multiple environments.**
 
+![Example](https://raw.githubusercontent.com/kallaspriit/migrator-js/master/example/example.gif)
+
 - Can be used for running any kind of tasks that need to be executed on multiple environments.
 - Works great for migrating database schemas and data but also for changing image file formats etc.
 - The storage method is extensive so the information about which migrations have been carried out can be stored anywhere (database, simple file etc).
@@ -34,15 +36,8 @@ npm install migrator-js
 - `yarn prettier` to run prettier.
 - `yarn audit` to run all pre-commit checks (prettier, build, lint, test)
 
-## Example
-
-![Choose migrations](https://raw.githubusercontent.com/kallaspriit/migrator-js/master/screenshots/choose-migrations.png)
-
-![Result](https://raw.githubusercontent.com/kallaspriit/migrator-js/master/screenshots/result.png)
-
-See `src/example` directory for a full working example code and run `npm start` to try it out for yourself.
-
 **Example migration script**
+
 ```javascript
 import {IMigrationContext} from '../';
 
@@ -58,6 +53,7 @@ export default async (context: IMigrationContext): Promise<string> => {
 Store it in `src/scripts/migrate.ts` etc and add NPM script to run it.
 
 `package.json`
+
 ```json
 {
   "scripts": {
@@ -67,6 +63,7 @@ Store it in `src/scripts/migrate.ts` etc and add NPM script to run it.
 ```
 
 `src/scripts/migrate.ts`
+
 ```javascript
 import chalk from 'chalk';
 import * as path from 'path';
