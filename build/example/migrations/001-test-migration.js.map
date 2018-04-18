@@ -1,1 +1,1 @@
-{"version":3,"file":"001-test-migration.js","sourceRoot":"","sources":["../../../src/example/migrations/001-test-migration.ts"],"names":[],"mappings":";;;;;;;;;;AAEA,kBAAe,CAAO,OAA0B,EAAmB,EAAE;IACpE,MAAM,CAAC,YAAY,OAAO,CAAC,OAAO,EAAE,CAAC;AACtC,CAAC,CAAA,CAAC"}
+{"version":3,"file":"001-test-migration.js","sourceRoot":"","sources":["../../../example/migrations/001-test-migration.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,iBAGA;;AADA,mBAAe,UAAO,OAA0B;IAAsB,sBAAA,cAAY,OAAO,CAAC,OAAS,EAAA;SAAA,EAAC"}

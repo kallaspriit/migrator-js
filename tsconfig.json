@@ -1,32 +1,19 @@
 {
-	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
-		"allowJs": false,
-		"outDir": "./build",
-		"removeComments": false,
-		"downlevelIteration": true,
-		"noImplicitAny": true,
-		"strictNullChecks": true,
-		"noImplicitThis": true,
-		"alwaysStrict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true,
-		"moduleResolution": "node",
-		"baseUrl": "./",
-		"typeRoots": ["./node_modules/@types", "./typings"],
-		"allowSyntheticDefaultImports": false,
-		"strict": true,
-		"pretty": true,
-		"allowUnreachableCode": false,
-		"sourceMap": true,
-		"noEmitOnError": true,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
-		"declaration": true
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "build"]
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es2015"],
+    "rootDirs": ["src", "example"],
+    "outDir": "build",
+    "moduleResolution": "node",
+    "declaration": true,
+    "sourceMap": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "experimentalDecorators": true
+  }
 }

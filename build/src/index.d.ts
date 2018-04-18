@@ -1,12 +1,12 @@
-import { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationStatus } from './common';
-export { default as MigratorTypeormStorage } from './storage/typeorm';
-export { ConnectionOptions, Connection, createConnection } from 'typeorm';
-export { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationExecutorFn, MigrationStatus } from './common';
+import { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationStatus } from "./common";
+export { default as MigratorTypeormStorage } from "./storage/typeorm";
+export { ConnectionOptions, Connection, createConnection } from "typeorm";
+export { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationExecutorFn, MigrationStatus } from "./common";
 export declare class Migration<Context> implements IMigration {
     name: string;
     filename: string;
-    protected context: Context;
-    protected storage: IMigrationStorage;
+    private readonly context;
+    private readonly storage;
     status: MigrationStatus;
     timeTaken?: number;
     result?: string;
@@ -17,12 +17,12 @@ export declare class Migration<Context> implements IMigration {
     toJSON(): IMigration;
 }
 export declare class Migrator<Context> {
-    protected context: Context;
-    protected options: IMigratorOptions;
+    private readonly context;
+    private readonly options;
     constructor(context: Context, userOptions: Partial<IMigratorOptions>);
+    private static getMigrationName(migrationFilename);
     getMigrationFilenames(): Promise<string[]>;
     getPerformedMigrations(): Promise<IMigration[]>;
     getPendingMigrations(): Promise<Array<Migration<Context>>>;
-    protected getMigrationName(migrationFilename: string): string;
 }
 export default function migrate<Context>(context: Context, options: Partial<IMigratorOptions>): Promise<IMigrationResult>;

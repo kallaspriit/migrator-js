@@ -26,12 +26,13 @@ npm install migrator-js
 
 ## Commands
 
+- `yarn start` to start the example application.
 - `yarn build` to build the production version.
 - `yarn test` to run tests.
-- `yarn lint` to lint the codebase.
-- `yarn migrate` to run the the example migration script.
 - `yarn coverage` to gather code coverage.
+- `yarn lint` to lint the codebase.
 - `yarn prettier` to run prettier.
+- `yarn audit` to run all pre-commit checks (prettier, build, lint, test)
 
 ## Example
 
