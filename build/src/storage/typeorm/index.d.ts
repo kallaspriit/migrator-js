@@ -14,7 +14,6 @@ export declare class Migration {
 }
 export default class MigratorTypeormStorage implements IMigrationStorage {
     private readonly connectionOptions;
-    private connectionCount;
     constructor(connectionOptions: ConnectionOptions);
     private static getMigrationInfo(migration);
     getPerformedMigrations(): Promise<IMigration[]>;

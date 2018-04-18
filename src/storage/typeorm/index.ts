@@ -5,6 +5,7 @@ import {
   createConnection,
   CreateDateColumn,
   Entity,
+  getConnection,
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -38,8 +39,6 @@ export class Migration {
 
 // tslint:disable-next-line:max-classes-per-file
 export default class MigratorTypeormStorage implements IMigrationStorage {
-  private connectionCount = 0;
-
   public constructor(private readonly connectionOptions: ConnectionOptions) {}
 
   private static getMigrationInfo(migration: Migration): IMigration {
@@ -123,13 +122,25 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
   }
 
   private async getConnection(): Promise<Connection> {
+    // close existing connection if one exists
+    try {
+      // this will throw if no connection exists
+      const existingConnection = getConnection();
+
+      await existingConnection.close();
+    } catch (e) {
+      // not having an existing connection is expected
+    }
+
+    // create a new connection
     const connection = await createConnection({
       ...this.connectionOptions,
-      name: `migrator-${++this.connectionCount}`,
+      name: `migrator`,
       entities: [Migration],
       synchronize: true,
     });
 
+    // throw error if failed to actually connect
     if (!connection.isConnected) {
       throw new Error(`Connecting to migrator-js database failed (${JSON.stringify(this.connectionOptions)})`);
     }

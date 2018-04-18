@@ -1,8 +1,8 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js start
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js audit
 
 PATH: 
-  C:\cmder\bin;C:\cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\cmder\vendor\conemu-maximus5;C:\cmder\vendor\conemu-maximus5\ConEmu;C:\Program Files\Docker\Docker\Resources\bin;C:\ProgramData\Oracle\Java\javapath;C:\Python27\;C:\Python27\Scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Git\cmd;C:\Program Files\PuTTY\;C:\OpenSSL-Win32\bin;C:\Program Files\SourceGear\Common\DiffMerge\;C:\Program Files\MariaDB 10.1\bin;C:\Program Files\LLVM\bin;C:\Program Files\Common Files\Autodesk Shared\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Users\kalla\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Microsoft VS Code\bin;C:\Users\kalla\AppData\Local\Microsoft\WindowsApps;C:\Users\kalla\AppData\Roaming\npm;C:\Users\kalla\AppData\Local\Yarn\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\share\vim\vim74;C:\cmder\
+  C:\cmder\bin;C:\cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\cmder\bin;C:\cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\cmder\vendor\conemu-maximus5;C:\cmder\vendor\conemu-maximus5\ConEmu;C:\Program Files\Docker\Docker\Resources\bin;C:\ProgramData\Oracle\Java\javapath;C:\Python27\;C:\Python27\Scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Git\cmd;C:\Program Files\PuTTY\;C:\OpenSSL-Win32\bin;C:\Program Files\SourceGear\Common\DiffMerge\;C:\Program Files\MariaDB 10.1\bin;C:\Program Files\LLVM\bin;C:\Program Files\Common Files\Autodesk Shared\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Users\kalla\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Microsoft VS Code\bin;C:\Users\kalla\AppData\Local\Microsoft\WindowsApps;C:\Users\kalla\AppData\Roaming\npm;C:\Users\kalla\AppData\Local\Yarn\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\share\vim\vim74;C:\cmder\;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\share\vim\vim74;C:\cmder\
 
 Yarn version: 
   1.5.1
@@ -16,7 +16,7 @@ Platform:
 npm manifest: 
   {
     "name": "migrator-js",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "description": "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
     "main": "build/index.js",
     "types": "build/index.d.ts",
@@ -4153,7 +4153,7 @@ Trace:
   Error: Command failed.
   Exit code: 1
   Command: C:\WINDOWS\system32\cmd.exe
-  Arguments: /d /s /c yarn build && node build/example/index
+  Arguments: /d /s /c yarn prettier && yarn build && yarn lint && yarn test
   Directory: D:\projects\migrator-js
   Output:
   

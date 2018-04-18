@@ -13,7 +13,7 @@ exports[`migrator-js provides interactive migrator 1`] = `
 Object {
   "chosenMigrations": Array [
     Object {
-      "name": "001-test-migration.ts",
+      "name": "001-success-example.ts",
       "result": "version: 1",
       "status": "COMPLETE",
     },
@@ -32,7 +32,7 @@ Object {
   ],
   "pendingMigrations": Array [
     Object {
-      "name": "001-test-migration.ts",
+      "name": "001-success-example.ts",
       "result": "version: 1",
       "status": "COMPLETE",
     },
@@ -44,7 +44,7 @@ Object {
   ],
   "performedMigrations": Array [
     Object {
-      "name": "001-test-migration.ts",
+      "name": "001-success-example.ts",
       "result": "version: 1",
       "status": "COMPLETE",
     },
@@ -55,7 +55,7 @@ Object {
 exports[`migrator-js should handle failing migration 1`] = `
 Array [
   Object {
-    "name": "001-test-migration.ts",
+    "name": "001-success-example.ts",
     "result": undefined,
     "status": "PENDING",
   },
@@ -70,7 +70,7 @@ Array [
 exports[`migrator-js should handle failing migration 2`] = `
 Array [
   Object {
-    "name": "001-test-migration.ts",
+    "name": "001-success-example.ts",
     "result": undefined,
     "status": "PENDING",
   },
@@ -84,7 +84,7 @@ Array [
 
 exports[`migrator-js should provide list of pending migrations 1`] = `
 Object {
-  "name": "001-test-migration.ts",
+  "name": "001-success-example.ts",
   "result": undefined,
   "status": "PENDING",
 }
@@ -93,7 +93,7 @@ Object {
 exports[`migrator-js should provide list of pending migrations 2`] = `
 Array [
   Object {
-    "name": "001-test-migration.ts",
+    "name": "001-success-example.ts",
     "result": undefined,
     "status": "PENDING",
   },
@@ -108,7 +108,7 @@ Array [
 exports[`migrator-js should run a single migration 1`] = `
 Array [
   Object {
-    "name": "001-test-migration.ts",
+    "name": "001-success-example.ts",
     "result": undefined,
     "status": "PENDING",
   },

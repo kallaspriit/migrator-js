@@ -85,7 +85,6 @@ exports.Migration = Migration;
 var MigratorTypeormStorage = /** @class */ (function () {
     function MigratorTypeormStorage(connectionOptions) {
         this.connectionOptions = connectionOptions;
-        this.connectionCount = 0;
     }
     MigratorTypeormStorage.getMigrationInfo = function (migration) {
         return {
@@ -204,12 +203,23 @@ var MigratorTypeormStorage = /** @class */ (function () {
     };
     MigratorTypeormStorage.prototype.getConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var connection;
+            var existingConnection, e_4, connection;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, typeorm_1.createConnection(__assign({}, this.connectionOptions, { name: "migrator-" + ++this.connectionCount, entities: [Migration], synchronize: true }))];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        existingConnection = typeorm_1.getConnection();
+                        return [4 /*yield*/, existingConnection.close()];
                     case 1:
+                        _a.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_4 = _a.sent();
+                        return [3 /*break*/, 3];
+                    case 3: return [4 /*yield*/, typeorm_1.createConnection(__assign({}, this.connectionOptions, { name: "migrator", entities: [Migration], synchronize: true }))];
+                    case 4:
                         connection = _a.sent();
+                        // throw error if failed to actually connect
                         if (!connection.isConnected) {
                             throw new Error("Connecting to migrator-js database failed (" + JSON.stringify(this.connectionOptions) + ")");
                         }
