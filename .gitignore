@@ -3,3 +3,4 @@ coverage
 .idea
 coveralls.yml
 migrate*.sqlite3
+yarn-*.log
