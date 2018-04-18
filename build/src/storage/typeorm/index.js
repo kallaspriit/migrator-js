@@ -81,6 +81,7 @@ var Migration = /** @class */ (function () {
     return Migration;
 }());
 exports.Migration = Migration;
+exports.DATABASE_CONNECTION_NAME = "migrator";
 // tslint:disable-next-line:max-classes-per-file
 var MigratorTypeormStorage = /** @class */ (function () {
     function MigratorTypeormStorage(connectionOptions) {
@@ -208,7 +209,7 @@ var MigratorTypeormStorage = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        existingConnection = typeorm_1.getConnection();
+                        existingConnection = typeorm_1.getConnection(exports.DATABASE_CONNECTION_NAME);
                         return [4 /*yield*/, existingConnection.close()];
                     case 1:
                         _a.sent();
@@ -216,7 +217,7 @@ var MigratorTypeormStorage = /** @class */ (function () {
                     case 2:
                         e_4 = _a.sent();
                         return [3 /*break*/, 3];
-                    case 3: return [4 /*yield*/, typeorm_1.createConnection(__assign({}, this.connectionOptions, { name: "migrator", entities: [Migration], synchronize: true }))];
+                    case 3: return [4 /*yield*/, typeorm_1.createConnection(__assign({}, this.connectionOptions, { name: exports.DATABASE_CONNECTION_NAME, entities: [Migration], synchronize: true }))];
                     case 4:
                         connection = _a.sent();
                         // throw error if failed to actually connect

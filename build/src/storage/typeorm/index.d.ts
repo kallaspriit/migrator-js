@@ -12,6 +12,7 @@ export declare class Migration {
     startDate: Date;
     endDate: Date;
 }
+export declare const DATABASE_CONNECTION_NAME = "migrator";
 export default class MigratorTypeormStorage implements IMigrationStorage {
     private readonly connectionOptions;
     constructor(connectionOptions: ConnectionOptions);

@@ -37,6 +37,8 @@ export class Migration {
   @UpdateDateColumn() public endDate!: Date;
 }
 
+export const DATABASE_CONNECTION_NAME = "migrator";
+
 // tslint:disable-next-line:max-classes-per-file
 export default class MigratorTypeormStorage implements IMigrationStorage {
   public constructor(private readonly connectionOptions: ConnectionOptions) {}
@@ -125,7 +127,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
     // close existing connection if one exists
     try {
       // this will throw if no connection exists
-      const existingConnection = getConnection();
+      const existingConnection = getConnection(DATABASE_CONNECTION_NAME);
 
       await existingConnection.close();
     } catch (e) {
@@ -135,7 +137,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
     // create a new connection
     const connection = await createConnection({
       ...this.connectionOptions,
-      name: `migrator`,
+      name: DATABASE_CONNECTION_NAME,
       entities: [Migration],
       synchronize: true,
     });
