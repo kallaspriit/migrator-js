@@ -1,9 +1,10 @@
 {
   "name": "migrator-js",
   "version": "2.3.0",
-  "description": "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "description":
+    "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
   "scripts": {
     "start": "yarn build && node build/example/index",
     "build": "yarn tidy:build && tsc",
@@ -24,10 +25,7 @@
     "type": "git",
     "url": "https://github.com/kallaspriit/migrator-js.git"
   },
-  "keywords": [
-    "migrator",
-    "migrate"
-  ],
+  "keywords": ["migrator", "migrate"],
   "author": "Priit Kallas <kallaspriit@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -63,21 +61,10 @@
     "transform": {
       "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "roots": [
-      "src",
-      "example"
-    ],
+    "roots": ["src", "example"],
     "collectCoverage": false,
-    "collectCoverageFrom": [
-      "src/**/*.ts",
-      "example/**/*.ts"
-    ],
+    "collectCoverageFrom": ["src/**/*.ts", "example/**/*.ts"],
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "json"
-    ]
+    "moduleFileExtensions": ["ts", "tsx", "js", "json"]
   }
 }
