@@ -58,7 +58,7 @@ var Migration = /** @class */ (function () {
     function Migration() {
     }
     __decorate([
-        typeorm_1.PrimaryColumn({ type: "varchar", nullable: false, length: 255 }),
+        typeorm_1.PrimaryColumn({ type: "varchar", nullable: false, length: 100 }),
         __metadata("design:type", String)
     ], Migration.prototype, "name", void 0);
     __decorate([

@@ -17,7 +17,7 @@ export interface IDatabaseResult {
 
 @Entity()
 export class Migration {
-  @PrimaryColumn({ type: "varchar", nullable: false, length: 255 })
+  @PrimaryColumn({ type: "varchar", nullable: false, length: 100 })
   public name!: string;
 
   @Column({ type: "varchar", nullable: true })
