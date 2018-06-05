@@ -186,7 +186,7 @@ var MigratorTypeormStorage = /** @class */ (function () {
                     case 2:
                         _a.trys.push([2, 5, 6, 8]);
                         repository = connection.getRepository(Migration);
-                        return [4 /*yield*/, repository.findOne(name)];
+                        return [4 /*yield*/, repository.findOneById(name)];
                     case 3:
                         migration = _a.sent();
                         if (!migration) {

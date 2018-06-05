@@ -105,7 +105,7 @@ export default class MigratorTypeormStorage implements MigrationStorage {
 
     try {
       const repository = connection.getRepository(Migration);
-      const migration = await repository.findOne(name);
+      const migration = await repository.findOneById(name);
 
       if (!migration) {
         throw new Error(`Migration called "${name}" was not found`);
