@@ -1,6 +1,6 @@
 {
   "name": "migrator-js",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -45,7 +45,7 @@
     "listr": "^0.14.1",
     "string-natural-compare": "^2.0.2",
     "tslint-config-strict": "^1.8.0",
-    "typeorm": "^0.2.7"
+    "typeorm": "0.1.19"
   },
   "devDependencies": {
     "@types/jest": "^23.0.0",
