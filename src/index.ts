@@ -5,27 +5,31 @@ import * as path from "path";
 import * as naturalSort from "string-natural-compare";
 import { ConnectionOptions } from "typeorm";
 import {
-  IMigration,
-  IMigrationResult,
-  IMigrationStorage,
-  IMigratorOptions,
   MigrationExecutorFn,
+  MigrationInfo,
+  MigrationResult,
   MigrationStatus,
+  MigrationStorage,
+  MigratorOptions,
 } from "./common";
 import MigratorTypeormStorage from "./storage/typeorm";
 
 export { default as MigratorTypeormStorage } from "./storage/typeorm";
 export { ConnectionOptions, Connection, createConnection } from "typeorm";
 export {
-  IMigration,
-  IMigrationResult,
-  IMigrationStorage,
-  IMigratorOptions,
+  MigrationInfo,
+  MigrationResult,
+  MigrationStorage,
+  MigratorOptions,
   MigrationExecutorFn,
   MigrationStatus,
 } from "./common";
 
-export class Migration<Context> implements IMigration {
+interface MigrationPromptResult {
+  chosenMigrations: string[];
+}
+
+export class Migration<Context> implements MigrationInfo {
   public status = MigrationStatus.PENDING;
   public timeTaken?: number;
   public result?: string;
@@ -36,7 +40,7 @@ export class Migration<Context> implements IMigration {
     public name: string,
     public filename: string,
     private readonly context: Context,
-    private readonly storage: IMigrationStorage,
+    private readonly storage: MigrationStorage,
   ) {}
 
   public async run(): Promise<string> {
@@ -69,7 +73,7 @@ export class Migration<Context> implements IMigration {
     });
   }
 
-  public toJSON(): IMigration {
+  public toJSON(): MigrationInfo {
     return {
       name: this.name,
       filename: this.filename,
@@ -84,9 +88,9 @@ export class Migration<Context> implements IMigration {
 
 // tslint:disable-next-line:max-classes-per-file
 export class Migrator<Context> {
-  private readonly options: IMigratorOptions;
+  private readonly options: MigratorOptions;
 
-  public constructor(private readonly context: Context, userOptions: Partial<IMigratorOptions>) {
+  public constructor(private readonly context: Context, userOptions: Partial<MigratorOptions>) {
     const connectionOptions: ConnectionOptions = {
       type: "sqlite",
       name: `migrator`,
@@ -120,7 +124,7 @@ export class Migrator<Context> {
     });
   }
 
-  public async getPerformedMigrations(): Promise<IMigration[]> {
+  public async getPerformedMigrations(): Promise<MigrationInfo[]> {
     return this.options.storage.getPerformedMigrations();
   }
 
@@ -149,9 +153,9 @@ export class Migrator<Context> {
 
 export default async function migrate<Context>(
   context: Context,
-  options: Partial<IMigratorOptions>,
-): Promise<IMigrationResult> {
-  return new Promise<IMigrationResult>(async (resolve, _reject) => {
+  options: Partial<MigratorOptions>,
+): Promise<MigrationResult> {
+  return new Promise<MigrationResult>(async (resolve, _reject) => {
     const migrator = new Migrator(context, options);
     const pendingMigrations = await migrator.getPendingMigrations();
 
@@ -173,7 +177,7 @@ export default async function migrate<Context>(
       chosenMigrationFilenames = pendingMigrations.map(pendingMigration => pendingMigration.filename);
     } else {
       // this is very hard to test
-      const choiceResult = await inquirer.prompt([
+      const choiceResult = await inquirer.prompt<MigrationPromptResult>([
         {
           type: "checkbox",
           name: "chosenMigrations",

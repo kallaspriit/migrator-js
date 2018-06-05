@@ -1,3 +1,3 @@
-export interface IMigrationContext {
+export interface MigrationContext {
     version: string;
 }

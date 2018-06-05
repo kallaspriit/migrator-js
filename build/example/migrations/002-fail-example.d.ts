@@ -1,3 +1,3 @@
-import { IMigrationContext } from "../";
-declare const _default: (_context: IMigrationContext) => Promise<string>;
+import { MigrationContext } from "../";
+declare const _default: (_context: MigrationContext) => Promise<string>;
 export default _default;

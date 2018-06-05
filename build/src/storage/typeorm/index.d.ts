@@ -1,6 +1,6 @@
 import { ConnectionOptions } from "typeorm";
-import { IMigration, IMigrationStorage, MigrationStatus } from "../../common";
-export interface IDatabaseResult {
+import { MigrationInfo, MigrationStatus, MigrationStorage } from "../../common";
+export interface DatabaseResult {
     [x: string]: string | number;
 }
 export declare class Migration {
@@ -13,12 +13,12 @@ export declare class Migration {
     endDate: Date;
 }
 export declare const DATABASE_CONNECTION_NAME = "migrator";
-export default class MigratorTypeormStorage implements IMigrationStorage {
+export default class MigratorTypeormStorage implements MigrationStorage {
     private readonly connectionOptions;
     constructor(connectionOptions: ConnectionOptions);
-    private static getMigrationInfo(migration);
-    getPerformedMigrations(): Promise<IMigration[]>;
+    private static getMigrationInfo;
+    getPerformedMigrations(): Promise<MigrationInfo[]>;
     insertMigration(name: string, filename: string): Promise<void>;
     updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
-    private getConnection();
+    private getConnection;
 }

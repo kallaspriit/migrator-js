@@ -9,9 +9,9 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { IMigration, IMigrationStorage, MigrationStatus } from "../../common";
+import { MigrationInfo, MigrationStatus, MigrationStorage } from "../../common";
 
-export interface IDatabaseResult {
+export interface DatabaseResult {
   [x: string]: string | number;
 }
 
@@ -40,10 +40,10 @@ export class Migration {
 export const DATABASE_CONNECTION_NAME = "migrator";
 
 // tslint:disable-next-line:max-classes-per-file
-export default class MigratorTypeormStorage implements IMigrationStorage {
+export default class MigratorTypeormStorage implements MigrationStorage {
   public constructor(private readonly connectionOptions: ConnectionOptions) {}
 
-  private static getMigrationInfo(migration: Migration): IMigration {
+  private static getMigrationInfo(migration: Migration): MigrationInfo {
     return {
       name: migration.name,
       filename: migration.filename,
@@ -55,7 +55,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
     };
   }
 
-  public async getPerformedMigrations(): Promise<IMigration[]> {
+  public async getPerformedMigrations(): Promise<MigrationInfo[]> {
     const connection = await this.getConnection();
 
     try {
@@ -105,7 +105,7 @@ export default class MigratorTypeormStorage implements IMigrationStorage {
 
     try {
       const repository = connection.getRepository(Migration);
-      const migration = await repository.findOneById(name);
+      const migration = await repository.findOne(name);
 
       if (!migration) {
         throw new Error(`Migration called "${name}" was not found`);

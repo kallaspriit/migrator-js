@@ -166,8 +166,8 @@ var Migrator = /** @class */ (function () {
     };
     Migrator.prototype.getPendingMigrations = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
             var migrationFilenames, performedMigrations;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getMigrationFilenames()];

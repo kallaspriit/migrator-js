@@ -2,9 +2,9 @@ export declare enum MigrationStatus {
     PENDING = "PENDING",
     RUNNING = "RUNNING",
     COMPLETE = "COMPLETE",
-    FAILED = "FAILED",
+    FAILED = "FAILED"
 }
-export interface IMigration {
+export interface MigrationInfo {
     name: string;
     filename: string;
     status: MigrationStatus;
@@ -13,20 +13,20 @@ export interface IMigration {
     endDate?: Date;
     result?: string;
 }
-export interface IMigrationStorage {
-    getPerformedMigrations(): Promise<IMigration[]>;
+export interface MigrationStorage {
+    getPerformedMigrations(): Promise<MigrationInfo[]>;
     insertMigration(name: string, filename: string): Promise<void>;
     updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
 }
 export declare type MigrationExecutorFn<Context> = (context: Context) => Promise<string>;
-export interface IMigratorOptions {
+export interface MigratorOptions {
     pattern: string;
-    storage: IMigrationStorage;
+    storage: MigrationStorage;
     autorunAll: boolean;
 }
-export interface IMigrationResult {
-    pendingMigrations: IMigration[];
-    chosenMigrations: IMigration[];
-    performedMigrations: IMigration[];
-    failedMigrations: IMigration[];
+export interface MigrationResult {
+    pendingMigrations: MigrationInfo[];
+    chosenMigrations: MigrationInfo[];
+    performedMigrations: MigrationInfo[];
+    failedMigrations: MigrationInfo[];
 }

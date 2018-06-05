@@ -2,18 +2,18 @@ import * as del from "del";
 import * as path from "path";
 import migrate, {
   ConnectionOptions,
-  IMigration,
-  IMigratorOptions,
+  MigrationInfo,
   MigrationStatus,
   Migrator,
+  MigratorOptions,
   MigratorTypeormStorage,
 } from "../src";
 
-interface IMigrationContext {
+interface MigrationContext {
   version: string;
 }
 
-interface IMigrationSnapshot {
+interface MigrationSnapshot {
   name: string;
   status: MigrationStatus;
   result?: string;
@@ -32,7 +32,7 @@ function getConnectionOptions(): ConnectionOptions {
   };
 }
 
-function getMigratorOptions(): IMigratorOptions {
+function getMigratorOptions(): MigratorOptions {
   return {
     pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
     storage: new MigratorTypeormStorage(getConnectionOptions()),
@@ -40,11 +40,11 @@ function getMigratorOptions(): IMigratorOptions {
   };
 }
 
-async function setupMigrator(): Promise<Migrator<IMigrationContext>> {
-  return new Migrator<IMigrationContext>(context, getMigratorOptions());
+async function setupMigrator(): Promise<Migrator<MigrationContext>> {
+  return new Migrator<MigrationContext>(context, getMigratorOptions());
 }
 
-function preprocessSnapshot(migration: IMigration): IMigrationSnapshot {
+function preprocessSnapshot(migration: MigrationInfo): MigrationSnapshot {
   return {
     name: migration.name,
     status: migration.status,
@@ -93,7 +93,7 @@ describe("migrator-js", () => {
   });
 
   it("provides interactive migrator", async () => {
-    const results = await migrate<IMigrationContext>(context, {
+    const results = await migrate<MigrationContext>(context, {
       ...getMigratorOptions(),
       autorunAll: true,
     });
@@ -107,7 +107,7 @@ describe("migrator-js", () => {
   });
 
   it("handles empty list of pending migrations", async () => {
-    const results = await migrate<IMigrationContext>(context, {
+    const results = await migrate<MigrationContext>(context, {
       ...getMigratorOptions(),
       autorunAll: true,
       pattern: "xxx", // won't find any migrations

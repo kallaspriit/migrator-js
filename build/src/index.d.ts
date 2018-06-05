@@ -1,8 +1,8 @@
-import { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationStatus } from "./common";
+import { MigrationInfo, MigrationResult, MigrationStatus, MigrationStorage, MigratorOptions } from "./common";
 export { default as MigratorTypeormStorage } from "./storage/typeorm";
 export { ConnectionOptions, Connection, createConnection } from "typeorm";
-export { IMigration, IMigrationResult, IMigrationStorage, IMigratorOptions, MigrationExecutorFn, MigrationStatus } from "./common";
-export declare class Migration<Context> implements IMigration {
+export { MigrationInfo, MigrationResult, MigrationStorage, MigratorOptions, MigrationExecutorFn, MigrationStatus, } from "./common";
+export declare class Migration<Context> implements MigrationInfo {
     name: string;
     filename: string;
     private readonly context;
@@ -12,17 +12,17 @@ export declare class Migration<Context> implements IMigration {
     result?: string;
     startDate?: Date;
     endDate?: Date;
-    constructor(name: string, filename: string, context: Context, storage: IMigrationStorage);
+    constructor(name: string, filename: string, context: Context, storage: MigrationStorage);
     run(): Promise<string>;
-    toJSON(): IMigration;
+    toJSON(): MigrationInfo;
 }
 export declare class Migrator<Context> {
     private readonly context;
     private readonly options;
-    constructor(context: Context, userOptions: Partial<IMigratorOptions>);
-    private static getMigrationName(migrationFilename);
+    constructor(context: Context, userOptions: Partial<MigratorOptions>);
+    private static getMigrationName;
     getMigrationFilenames(): Promise<string[]>;
-    getPerformedMigrations(): Promise<IMigration[]>;
+    getPerformedMigrations(): Promise<MigrationInfo[]>;
     getPendingMigrations(): Promise<Array<Migration<Context>>>;
 }
-export default function migrate<Context>(context: Context, options: Partial<IMigratorOptions>): Promise<IMigrationResult>;
+export default function migrate<Context>(context: Context, options: Partial<MigratorOptions>): Promise<MigrationResult>;

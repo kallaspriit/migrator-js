@@ -5,7 +5,7 @@ import migrate, { MigratorTypeormStorage } from "../src";
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
 
 // any context resources passed on to all migrations
-export interface IMigrationContext {
+export interface MigrationContext {
   version: string;
 }
 
@@ -16,7 +16,7 @@ async function run() {
   // attempt to run the migrator
   try {
     // run migrator providing pattern of migration files, storage to use and context to pass to each migration
-    const result = await migrate<IMigrationContext>(
+    const result = await migrate<MigrationContext>(
       {
         version: "1",
       },
