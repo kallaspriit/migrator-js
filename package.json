@@ -37,7 +37,7 @@
   "dependencies": {
     "@types/del": "^3.0.1",
     "@types/glob": "^5.0.35",
-    "@types/inquirer": "^0.0.41",
+    "@types/inquirer": "^0.0.42",
     "chalk": "^2.4.1",
     "del": "^3.0.0",
     "glob": "^7.1.2",
@@ -45,16 +45,17 @@
     "listr": "^0.14.1",
     "string-natural-compare": "^2.0.2",
     "tslint-config-strict": "^1.8.0",
-    "typeorm": "0.1.19"
+    "typeorm": "^0.2.7"
   },
   "devDependencies": {
     "@types/jest": "^23.0.0",
+    "babel-core": "^6.26.3",
     "coveralls": "^3.0.1",
     "jest": "^23.1.0",
     "prettier": "^1.13.4",
     "rimraf": "^2.6.2",
     "sqlite3": "^4.0.0",
-    "ts-jest": "^22.4.6",
+    "ts-jest": "^23.0.0",
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.13.0",
     "typescript": "^2.9.1"
