@@ -32,9 +32,11 @@ export class Migration {
   @Column({ type: "text", nullable: true })
   public result!: string;
 
-  @CreateDateColumn() public startDate!: Date;
+  @CreateDateColumn()
+  public startDate!: Date;
 
-  @UpdateDateColumn() public endDate!: Date;
+  @UpdateDateColumn()
+  public endDate!: Date;
 }
 
 export const DATABASE_CONNECTION_NAME = "migrator";
