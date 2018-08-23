@@ -12,11 +12,11 @@ export declare class Migration {
     result: string;
     startDate: Date;
     endDate: Date;
+    getInfo(): MigrationInfo;
 }
 export default class MigratorTypeormStorage implements MigrationStorage {
     private readonly connectionOptions;
     constructor(connectionOptions: ConnectionOptions);
-    private static getMigrationInfo;
     getPerformedMigrations(): Promise<MigrationInfo[]>;
     insertMigration(name: string, filename: string): Promise<void>;
     updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;

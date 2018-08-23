@@ -61,6 +61,17 @@ exports.DEFAULT_DATABASE_CONNECTION_NAME = "migrator";
 var Migration = /** @class */ (function () {
     function Migration() {
     }
+    Migration.prototype.getInfo = function () {
+        return {
+            name: this.name,
+            filename: this.filename,
+            status: this.status,
+            timeTaken: this.timeTaken,
+            startDate: this.startDate,
+            endDate: this.endDate,
+            result: this.result,
+        };
+    };
     __decorate([
         typeorm_1.PrimaryColumn({ type: "varchar", nullable: false, length: 100 }),
         __metadata("design:type", String)
@@ -100,86 +111,56 @@ var MigratorTypeormStorage = /** @class */ (function () {
     function MigratorTypeormStorage(connectionOptions) {
         this.connectionOptions = connectionOptions;
     }
-    MigratorTypeormStorage.getMigrationInfo = function (migration) {
-        return {
-            name: migration.name,
-            filename: migration.filename,
-            status: migration.status,
-            timeTaken: migration.timeTaken,
-            startDate: migration.startDate,
-            endDate: migration.endDate,
-            result: migration.result,
-        };
-    };
     MigratorTypeormStorage.prototype.getPerformedMigrations = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var connection, migrations, e_1;
+            var connection, migrations;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.openConnection()];
                     case 1:
                         connection = _a.sent();
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 4, , 5]);
                         return [4 /*yield*/, connection.getRepository(Migration).find({
                                 where: {
                                     status: common_1.MigrationStatus.COMPLETE,
                                 },
                             })];
-                    case 3:
+                    case 2:
                         migrations = _a.sent();
-                        return [2 /*return*/, migrations.map(function (migration) { return MigratorTypeormStorage.getMigrationInfo(migration); })];
-                    case 4:
-                        e_1 = _a.sent();
-                        console.error("Fetching performed migrations failed", e_1.stack);
-                        return [2 /*return*/, []];
-                    case 5: return [2 /*return*/];
+                        return [2 /*return*/, migrations.map(function (migration) { return migration.getInfo(); })];
                 }
             });
         });
     };
     MigratorTypeormStorage.prototype.insertMigration = function (name, filename) {
         return __awaiter(this, void 0, void 0, function () {
-            var connection, e_2;
+            var connection;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.openConnection()];
                     case 1:
                         connection = _a.sent();
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 4, , 5]);
                         return [4 /*yield*/, connection.getRepository(Migration).save({
                                 name: name,
                                 filename: filename,
                                 status: common_1.MigrationStatus.RUNNING,
                             })];
-                    case 3:
+                    case 2:
                         _a.sent();
-                        return [3 /*break*/, 5];
-                    case 4:
-                        e_2 = _a.sent();
-                        console.error("Inserting migration failed", e_2.stack);
-                        return [3 /*break*/, 5];
-                    case 5: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });
     };
     MigratorTypeormStorage.prototype.updateMigration = function (name, status, result, timeTaken) {
         return __awaiter(this, void 0, void 0, function () {
-            var connection, migration, e_3;
+            var connection, migration;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.openConnection()];
                     case 1:
                         connection = _a.sent();
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 5, , 6]);
                         return [4 /*yield*/, connection.getRepository(Migration).findOne(name)];
-                    case 3:
+                    case 2:
                         migration = _a.sent();
                         if (!migration) {
                             throw new Error("Migration called \"" + name + "\" was not found");
@@ -188,14 +169,9 @@ var MigratorTypeormStorage = /** @class */ (function () {
                         migration.result = result;
                         migration.timeTaken = timeTaken;
                         return [4 /*yield*/, connection.getRepository(Migration).save(migration)];
-                    case 4:
+                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 6];
-                    case 5:
-                        e_3 = _a.sent();
-                        console.error("Updating migration failed", e_3.stack);
-                        return [3 /*break*/, 6];
-                    case 6: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });

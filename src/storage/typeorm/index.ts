@@ -39,54 +39,44 @@ export class Migration {
 
   @UpdateDateColumn()
   public endDate!: Date;
+
+  public getInfo(): MigrationInfo {
+    return {
+      name: this.name,
+      filename: this.filename,
+      status: this.status,
+      timeTaken: this.timeTaken,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      result: this.result,
+    };
+  }
 }
 
 // tslint:disable-next-line:max-classes-per-file
 export default class MigratorTypeormStorage implements MigrationStorage {
   public constructor(private readonly connectionOptions: ConnectionOptions) {}
 
-  private static getMigrationInfo(migration: Migration): MigrationInfo {
-    return {
-      name: migration.name,
-      filename: migration.filename,
-      status: migration.status,
-      timeTaken: migration.timeTaken,
-      startDate: migration.startDate,
-      endDate: migration.endDate,
-      result: migration.result,
-    };
-  }
-
   public async getPerformedMigrations(): Promise<MigrationInfo[]> {
     const connection = await this.openConnection();
 
-    try {
-      const migrations = await connection.getRepository(Migration).find({
-        where: {
-          status: MigrationStatus.COMPLETE,
-        },
-      });
+    const migrations = await connection.getRepository(Migration).find({
+      where: {
+        status: MigrationStatus.COMPLETE,
+      },
+    });
 
-      return migrations.map(migration => MigratorTypeormStorage.getMigrationInfo(migration));
-    } catch (e) {
-      console.error("Fetching performed migrations failed", e.stack);
-
-      return [];
-    }
+    return migrations.map(migration => migration.getInfo());
   }
 
   public async insertMigration(name: string, filename: string): Promise<void> {
     const connection = await this.openConnection();
 
-    try {
-      await connection.getRepository(Migration).save({
-        name,
-        filename,
-        status: MigrationStatus.RUNNING,
-      });
-    } catch (e) {
-      console.error("Inserting migration failed", e.stack);
-    }
+    await connection.getRepository(Migration).save({
+      name,
+      filename,
+      status: MigrationStatus.RUNNING,
+    });
   }
 
   public async updateMigration(
@@ -97,21 +87,17 @@ export default class MigratorTypeormStorage implements MigrationStorage {
   ): Promise<void> {
     const connection = await this.openConnection();
 
-    try {
-      const migration = await connection.getRepository(Migration).findOne(name);
+    const migration = await connection.getRepository(Migration).findOne(name);
 
-      if (!migration) {
-        throw new Error(`Migration called "${name}" was not found`);
-      }
-
-      migration.status = status;
-      migration.result = result;
-      migration.timeTaken = timeTaken;
-
-      await connection.getRepository(Migration).save(migration);
-    } catch (e) {
-      console.error("Updating migration failed", e.stack);
+    if (!migration) {
+      throw new Error(`Migration called "${name}" was not found`);
     }
+
+    migration.status = status;
+    migration.result = result;
+    migration.timeTaken = timeTaken;
+
+    await connection.getRepository(Migration).save(migration);
   }
 
   public async close(): Promise<void> {
