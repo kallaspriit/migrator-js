@@ -57,6 +57,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var common_1 = require("../../common");
+exports.DEFAULT_DATABASE_CONNECTION_NAME = "migrator";
 var Migration = /** @class */ (function () {
     function Migration() {
     }
@@ -94,7 +95,6 @@ var Migration = /** @class */ (function () {
     return Migration;
 }());
 exports.Migration = Migration;
-exports.DATABASE_CONNECTION_NAME = "migrator";
 // tslint:disable-next-line:max-classes-per-file
 var MigratorTypeormStorage = /** @class */ (function () {
     function MigratorTypeormStorage(connectionOptions) {
@@ -113,17 +113,16 @@ var MigratorTypeormStorage = /** @class */ (function () {
     };
     MigratorTypeormStorage.prototype.getPerformedMigrations = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var connection, repository, migrations, e_1;
+            var connection, migrations, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getConnection()];
+                    case 0: return [4 /*yield*/, this.openConnection()];
                     case 1:
                         connection = _a.sent();
                         _a.label = 2;
                     case 2:
-                        _a.trys.push([2, 4, 5, 7]);
-                        repository = connection.getRepository(Migration);
-                        return [4 /*yield*/, repository.find({
+                        _a.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, connection.getRepository(Migration).find({
                                 where: {
                                     status: common_1.MigrationStatus.COMPLETE,
                                 },
@@ -135,61 +134,51 @@ var MigratorTypeormStorage = /** @class */ (function () {
                         e_1 = _a.sent();
                         console.error("Fetching performed migrations failed", e_1.stack);
                         return [2 /*return*/, []];
-                    case 5: return [4 /*yield*/, connection.close()];
-                    case 6:
-                        _a.sent();
-                        return [7 /*endfinally*/];
-                    case 7: return [2 /*return*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
     };
     MigratorTypeormStorage.prototype.insertMigration = function (name, filename) {
         return __awaiter(this, void 0, void 0, function () {
-            var connection, repository, e_2;
+            var connection, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getConnection()];
+                    case 0: return [4 /*yield*/, this.openConnection()];
                     case 1:
                         connection = _a.sent();
                         _a.label = 2;
                     case 2:
-                        _a.trys.push([2, 4, 5, 7]);
-                        repository = connection.getRepository(Migration);
-                        return [4 /*yield*/, repository.save({
+                        _a.trys.push([2, 4, , 5]);
+                        return [4 /*yield*/, connection.getRepository(Migration).save({
                                 name: name,
                                 filename: filename,
                                 status: common_1.MigrationStatus.RUNNING,
                             })];
                     case 3:
                         _a.sent();
-                        return [3 /*break*/, 7];
+                        return [3 /*break*/, 5];
                     case 4:
                         e_2 = _a.sent();
                         console.error("Inserting migration failed", e_2.stack);
-                        return [3 /*break*/, 7];
-                    case 5: return [4 /*yield*/, connection.close()];
-                    case 6:
-                        _a.sent();
-                        return [7 /*endfinally*/];
-                    case 7: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
     };
     MigratorTypeormStorage.prototype.updateMigration = function (name, status, result, timeTaken) {
         return __awaiter(this, void 0, void 0, function () {
-            var connection, repository, migration, e_3;
+            var connection, migration, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getConnection()];
+                    case 0: return [4 /*yield*/, this.openConnection()];
                     case 1:
                         connection = _a.sent();
                         _a.label = 2;
                     case 2:
-                        _a.trys.push([2, 5, 6, 8]);
-                        repository = connection.getRepository(Migration);
-                        return [4 /*yield*/, repository.findOne(name)];
+                        _a.trys.push([2, 5, , 6]);
+                        return [4 /*yield*/, connection.getRepository(Migration).findOne(name)];
                     case 3:
                         migration = _a.sent();
                         if (!migration) {
@@ -198,45 +187,58 @@ var MigratorTypeormStorage = /** @class */ (function () {
                         migration.status = status;
                         migration.result = result;
                         migration.timeTaken = timeTaken;
-                        return [4 /*yield*/, repository.save(migration)];
+                        return [4 /*yield*/, connection.getRepository(Migration).save(migration)];
                     case 4:
                         _a.sent();
-                        return [3 /*break*/, 8];
+                        return [3 /*break*/, 6];
                     case 5:
                         e_3 = _a.sent();
                         console.error("Updating migration failed", e_3.stack);
-                        return [3 /*break*/, 8];
-                    case 6: return [4 /*yield*/, connection.close()];
-                    case 7:
-                        _a.sent();
-                        return [7 /*endfinally*/];
-                    case 8: return [2 /*return*/];
+                        return [3 /*break*/, 6];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
     };
-    MigratorTypeormStorage.prototype.getConnection = function () {
+    MigratorTypeormStorage.prototype.close = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var existingConnection, e_4, connection;
+            var name, connection;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        existingConnection = typeorm_1.getConnection(exports.DATABASE_CONNECTION_NAME);
-                        return [4 /*yield*/, existingConnection.close()];
+                        name = this.connectionOptions.name || exports.DEFAULT_DATABASE_CONNECTION_NAME;
+                        connection = typeorm_1.getConnection(name);
+                        if (!connection || !connection.isConnected) {
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, connection.close()];
                     case 1:
                         _a.sent();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_4 = _a.sent();
-                        return [3 /*break*/, 3];
-                    case 3: return [4 /*yield*/, typeorm_1.createConnection(__assign({}, this.connectionOptions, { name: exports.DATABASE_CONNECTION_NAME, entities: [Migration], synchronize: true }))];
-                    case 4:
-                        connection = _a.sent();
-                        // throw error if failed to actually connect
-                        if (!connection.isConnected) {
-                            throw new Error("Connecting to migrator-js database failed (" + JSON.stringify(this.connectionOptions) + ")");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    MigratorTypeormStorage.prototype.openConnection = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var name, existingConnection, connection;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        name = this.connectionOptions.name || exports.DEFAULT_DATABASE_CONNECTION_NAME;
+                        // use existing connection if exists
+                        try {
+                            existingConnection = typeorm_1.getConnection(name);
+                            if (existingConnection) {
+                                return [2 /*return*/, existingConnection];
+                            }
                         }
+                        catch (e) {
+                            // ignore, connection not found
+                        }
+                        return [4 /*yield*/, typeorm_1.createConnection(__assign({ name: name, entities: [Migration], synchronize: true }, this.connectionOptions))];
+                    case 1:
+                        connection = _a.sent();
                         return [2 /*return*/, connection];
                 }
             });

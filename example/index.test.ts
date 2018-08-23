@@ -1,6 +1,6 @@
 import * as del from "del";
 import * as path from "path";
-import migrate, {
+import {
   ConnectionOptions,
   MigrationInfo,
   MigrationStatus,
@@ -32,16 +32,12 @@ function getConnectionOptions(): ConnectionOptions {
   };
 }
 
-function getMigratorOptions(): MigratorOptions {
+function getMigratorOptions(override: Partial<MigratorOptions> = {}): MigratorOptions {
   return {
     pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
     storage: new MigratorTypeormStorage(getConnectionOptions()),
-    autorunAll: false,
+    ...override,
   };
-}
-
-async function setupMigrator(): Promise<Migrator<MigrationContext>> {
-  return new Migrator<MigrationContext>(context, getMigratorOptions());
 }
 
 function preprocessSnapshot(migration: MigrationInfo): MigrationSnapshot {
@@ -52,22 +48,35 @@ function preprocessSnapshot(migration: MigrationInfo): MigrationSnapshot {
   };
 }
 
+let migrator: Migrator<MigrationContext> | undefined;
+
 describe("migrator-js", () => {
-  // delete generated sqlite databases
+  // close the migrator after each test
   afterEach(async () => {
+    if (migrator) {
+      await migrator.close();
+    }
+  });
+
+  // delete the generated test databases after all tests
+  afterAll(async () => {
     await del([path.join(__dirname, "..", `*.sqlite3`)]);
   });
 
   it("should provide list of pending migrations", async () => {
-    const migrator = await setupMigrator();
+    migrator = new Migrator<MigrationContext>(context, getMigratorOptions());
+
     const pendingMigrations = await migrator.getPendingMigrations();
+
+    await migrator.close();
 
     expect(preprocessSnapshot(pendingMigrations[0].toJSON())).toMatchSnapshot();
     expect(pendingMigrations.map(preprocessSnapshot)).toMatchSnapshot();
   });
 
   it("should run a single migration", async () => {
-    const migrator = await setupMigrator();
+    migrator = new Migrator<MigrationContext>(context, getMigratorOptions());
+
     const pendingMigrations1 = await migrator.getPendingMigrations();
     expect(pendingMigrations1).toHaveLength(2);
     expect(pendingMigrations1.map(preprocessSnapshot)).toMatchSnapshot();
@@ -81,7 +90,8 @@ describe("migrator-js", () => {
   });
 
   it("should handle failing migration", async () => {
-    const migrator = await setupMigrator();
+    migrator = new Migrator<MigrationContext>(context, getMigratorOptions());
+
     const pendingMigrations1 = await migrator.getPendingMigrations();
     expect(pendingMigrations1).toHaveLength(2);
     expect(pendingMigrations1.map(preprocessSnapshot)).toMatchSnapshot();
@@ -93,10 +103,9 @@ describe("migrator-js", () => {
   });
 
   it("provides interactive migrator", async () => {
-    const results = await migrate<MigrationContext>(context, {
-      ...getMigratorOptions(),
-      autorunAll: true,
-    });
+    migrator = new Migrator<MigrationContext>(context, getMigratorOptions());
+
+    const results = await migrator.migrate(true);
 
     expect({
       pendingMigrations: results.pendingMigrations.map(preprocessSnapshot),
@@ -107,11 +116,14 @@ describe("migrator-js", () => {
   });
 
   it("handles empty list of pending migrations", async () => {
-    const results = await migrate<MigrationContext>(context, {
-      ...getMigratorOptions(),
-      autorunAll: true,
-      pattern: "xxx", // won't find any migrations
-    });
+    migrator = new Migrator<MigrationContext>(
+      context,
+      getMigratorOptions({
+        pattern: "xxx", // wont find any
+      }),
+    );
+
+    const results = await migrator.migrate(true);
 
     expect({
       pendingMigrations: results.pendingMigrations.map(preprocessSnapshot),

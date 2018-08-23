@@ -138,7 +138,7 @@ var Migrator = /** @class */ (function () {
             name: "migrator",
             database: "migrator.sqlite3",
         };
-        this.options = __assign({ pattern: path.join(__dirname, "..", "..", "src", "migrations", "!(*.spec|*.test|*.d).{ts,js}"), storage: new typeorm_1.default(connectionOptions), autorunAll: false }, userOptions);
+        this.options = __assign({ pattern: path.join(__dirname, "..", "..", "src", "migrations", "!(*.spec|*.test|*.d).{ts,js}"), storage: new typeorm_1.default(connectionOptions) }, userOptions);
     }
     Migrator.getMigrationName = function (migrationFilename) {
         return path.basename(migrationFilename, ".js");
@@ -190,99 +190,109 @@ var Migrator = /** @class */ (function () {
             });
         });
     };
+    Migrator.prototype.migrate = function (autoRun) {
+        if (autoRun === void 0) { autoRun = false; }
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, _reject) { return __awaiter(_this, void 0, void 0, function () {
+                        var pendingMigrations, chosenMigrationFilenames, choiceResult, chosenMigrations, taskRunner, _e_1;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, this.getPendingMigrations()];
+                                case 1:
+                                    pendingMigrations = _a.sent();
+                                    if (pendingMigrations.length === 0) {
+                                        resolve({
+                                            pendingMigrations: pendingMigrations,
+                                            chosenMigrations: [],
+                                            performedMigrations: [],
+                                            failedMigrations: [],
+                                        });
+                                        return [2 /*return*/];
+                                    }
+                                    chosenMigrationFilenames = [];
+                                    if (!autoRun) return [3 /*break*/, 2];
+                                    chosenMigrationFilenames = pendingMigrations.map(function (pendingMigration) { return pendingMigration.filename; });
+                                    return [3 /*break*/, 4];
+                                case 2: return [4 /*yield*/, inquirer.prompt([
+                                        {
+                                            type: "checkbox",
+                                            name: "chosenMigrations",
+                                            message: "Choose migrations to execute",
+                                            choices: pendingMigrations.map(function (pendingMigration) { return ({
+                                                name: pendingMigration.name,
+                                                value: pendingMigration.filename,
+                                            }); }),
+                                        },
+                                    ])];
+                                case 3:
+                                    choiceResult = _a.sent();
+                                    chosenMigrationFilenames = choiceResult.chosenMigrations;
+                                    _a.label = 4;
+                                case 4:
+                                    chosenMigrations = pendingMigrations.filter(function (pendingMigration) { return chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1; });
+                                    taskRunner = new Listr(chosenMigrations.map(function (migration) { return ({
+                                        title: migration.name,
+                                        task: function () {
+                                            return __awaiter(this, void 0, void 0, function () {
+                                                var e_2;
+                                                return __generator(this, function (_a) {
+                                                    switch (_a.label) {
+                                                        case 0:
+                                                            _a.trys.push([0, 2, , 3]);
+                                                            return [4 /*yield*/, migration.run()];
+                                                        case 1:
+                                                            _a.sent();
+                                                            this.title = this.title + " - done in " + migration.timeTaken + "ms";
+                                                            return [3 /*break*/, 3];
+                                                        case 2:
+                                                            e_2 = _a.sent();
+                                                            this.title = this.title + " - failed in " + migration.timeTaken + "ms";
+                                                            throw e_2;
+                                                        case 3: return [2 /*return*/];
+                                                    }
+                                                });
+                                            });
+                                        },
+                                    }); }));
+                                    _a.label = 5;
+                                case 5:
+                                    _a.trys.push([5, 7, , 8]);
+                                    return [4 /*yield*/, taskRunner.run()];
+                                case 6:
+                                    _a.sent();
+                                    return [3 /*break*/, 8];
+                                case 7:
+                                    _e_1 = _a.sent();
+                                    return [3 /*break*/, 8];
+                                case 8:
+                                    resolve({
+                                        pendingMigrations: pendingMigrations,
+                                        chosenMigrations: chosenMigrations,
+                                        performedMigrations: chosenMigrations.filter(function (migration) { return migration.status === common_1.MigrationStatus.COMPLETE; }),
+                                        failedMigrations: chosenMigrations.filter(function (migration) { return migration.status === common_1.MigrationStatus.FAILED; }),
+                                    });
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); })];
+            });
+        });
+    };
+    Migrator.prototype.close = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.options.storage.close()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     return Migrator;
 }());
 exports.Migrator = Migrator;
-function migrate(context, options) {
-    return __awaiter(this, void 0, void 0, function () {
-        var _this = this;
-        return __generator(this, function (_a) {
-            return [2 /*return*/, new Promise(function (resolve, _reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var migrator, pendingMigrations, chosenMigrationFilenames, choiceResult, chosenMigrations, taskRunner, _e_1;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                migrator = new Migrator(context, options);
-                                return [4 /*yield*/, migrator.getPendingMigrations()];
-                            case 1:
-                                pendingMigrations = _a.sent();
-                                if (pendingMigrations.length === 0) {
-                                    resolve({
-                                        pendingMigrations: pendingMigrations,
-                                        chosenMigrations: [],
-                                        performedMigrations: [],
-                                        failedMigrations: [],
-                                    });
-                                    return [2 /*return*/];
-                                }
-                                chosenMigrationFilenames = [];
-                                if (!(options.autorunAll === true)) return [3 /*break*/, 2];
-                                chosenMigrationFilenames = pendingMigrations.map(function (pendingMigration) { return pendingMigration.filename; });
-                                return [3 /*break*/, 4];
-                            case 2: return [4 /*yield*/, inquirer.prompt([
-                                    {
-                                        type: "checkbox",
-                                        name: "chosenMigrations",
-                                        message: "Choose migrations to execute",
-                                        choices: pendingMigrations.map(function (pendingMigration) { return ({
-                                            name: pendingMigration.name,
-                                            value: pendingMigration.filename,
-                                        }); }),
-                                    },
-                                ])];
-                            case 3:
-                                choiceResult = _a.sent();
-                                chosenMigrationFilenames = choiceResult.chosenMigrations;
-                                _a.label = 4;
-                            case 4:
-                                chosenMigrations = pendingMigrations.filter(function (pendingMigration) { return chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1; });
-                                taskRunner = new Listr(chosenMigrations.map(function (migration) { return ({
-                                    title: migration.name,
-                                    task: function () {
-                                        return __awaiter(this, void 0, void 0, function () {
-                                            var e_2;
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0:
-                                                        _a.trys.push([0, 2, , 3]);
-                                                        return [4 /*yield*/, migration.run()];
-                                                    case 1:
-                                                        _a.sent();
-                                                        this.title = this.title + " - done in " + migration.timeTaken + "ms";
-                                                        return [3 /*break*/, 3];
-                                                    case 2:
-                                                        e_2 = _a.sent();
-                                                        this.title = this.title + " - failed in " + migration.timeTaken + "ms";
-                                                        throw e_2;
-                                                    case 3: return [2 /*return*/];
-                                                }
-                                            });
-                                        });
-                                    },
-                                }); }));
-                                _a.label = 5;
-                            case 5:
-                                _a.trys.push([5, 7, , 8]);
-                                return [4 /*yield*/, taskRunner.run()];
-                            case 6:
-                                _a.sent();
-                                return [3 /*break*/, 8];
-                            case 7:
-                                _e_1 = _a.sent();
-                                return [3 /*break*/, 8];
-                            case 8:
-                                resolve({
-                                    pendingMigrations: pendingMigrations,
-                                    chosenMigrations: chosenMigrations,
-                                    performedMigrations: chosenMigrations.filter(function (migration) { return migration.status === common_1.MigrationStatus.COMPLETE; }),
-                                    failedMigrations: chosenMigrations.filter(function (migration) { return migration.status === common_1.MigrationStatus.FAILED; }),
-                                });
-                                return [2 /*return*/];
-                        }
-                    });
-                }); })];
-        });
-    });
-}
-exports.default = migrate;
 //# sourceMappingURL=index.js.map

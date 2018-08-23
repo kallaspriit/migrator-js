@@ -15,6 +15,8 @@ export interface DatabaseResult {
   [x: string]: string | number;
 }
 
+export const DEFAULT_DATABASE_CONNECTION_NAME = "migrator";
+
 @Entity()
 export class Migration {
   @PrimaryColumn({ type: "varchar", nullable: false, length: 100 })
@@ -39,8 +41,6 @@ export class Migration {
   public endDate!: Date;
 }
 
-export const DATABASE_CONNECTION_NAME = "migrator";
-
 // tslint:disable-next-line:max-classes-per-file
 export default class MigratorTypeormStorage implements MigrationStorage {
   public constructor(private readonly connectionOptions: ConnectionOptions) {}
@@ -58,12 +58,10 @@ export default class MigratorTypeormStorage implements MigrationStorage {
   }
 
   public async getPerformedMigrations(): Promise<MigrationInfo[]> {
-    const connection = await this.getConnection();
+    const connection = await this.openConnection();
 
     try {
-      const repository = connection.getRepository(Migration);
-
-      const migrations = await repository.find({
+      const migrations = await connection.getRepository(Migration).find({
         where: {
           status: MigrationStatus.COMPLETE,
         },
@@ -74,26 +72,20 @@ export default class MigratorTypeormStorage implements MigrationStorage {
       console.error("Fetching performed migrations failed", e.stack);
 
       return [];
-    } finally {
-      await connection.close();
     }
   }
 
   public async insertMigration(name: string, filename: string): Promise<void> {
-    const connection = await this.getConnection();
+    const connection = await this.openConnection();
 
     try {
-      const repository = connection.getRepository(Migration);
-
-      await repository.save({
+      await connection.getRepository(Migration).save({
         name,
         filename,
         status: MigrationStatus.RUNNING,
       });
     } catch (e) {
       console.error("Inserting migration failed", e.stack);
-    } finally {
-      await connection.close();
     }
   }
 
@@ -103,11 +95,10 @@ export default class MigratorTypeormStorage implements MigrationStorage {
     result: string,
     timeTaken: number,
   ): Promise<void> {
-    const connection = await this.getConnection();
+    const connection = await this.openConnection();
 
     try {
-      const repository = connection.getRepository(Migration);
-      const migration = await repository.findOne(name);
+      const migration = await connection.getRepository(Migration).findOne(name);
 
       if (!migration) {
         throw new Error(`Migration called "${name}" was not found`);
@@ -117,37 +108,44 @@ export default class MigratorTypeormStorage implements MigrationStorage {
       migration.result = result;
       migration.timeTaken = timeTaken;
 
-      await repository.save(migration);
+      await connection.getRepository(Migration).save(migration);
     } catch (e) {
       console.error("Updating migration failed", e.stack);
-    } finally {
-      await connection.close();
     }
   }
 
-  private async getConnection(): Promise<Connection> {
-    // close existing connection if one exists
-    try {
-      // this will throw if no connection exists
-      const existingConnection = getConnection(DATABASE_CONNECTION_NAME);
+  public async close(): Promise<void> {
+    const name = this.connectionOptions.name || DEFAULT_DATABASE_CONNECTION_NAME;
+    const connection = getConnection(name);
 
-      await existingConnection.close();
+    if (!connection || !connection.isConnected) {
+      return;
+    }
+
+    await connection.close();
+  }
+
+  private async openConnection(): Promise<Connection> {
+    const name = this.connectionOptions.name || DEFAULT_DATABASE_CONNECTION_NAME;
+
+    // use existing connection if exists
+    try {
+      const existingConnection = getConnection(name);
+
+      if (existingConnection) {
+        return existingConnection;
+      }
     } catch (e) {
-      // not having an existing connection is expected
+      // ignore, connection not found
     }
 
     // create a new connection
     const connection = await createConnection({
-      ...this.connectionOptions,
-      name: DATABASE_CONNECTION_NAME,
+      name,
       entities: [Migration],
       synchronize: true,
+      ...this.connectionOptions,
     });
-
-    // throw error if failed to actually connect
-    if (!connection.isConnected) {
-      throw new Error(`Connecting to migrator-js database failed (${JSON.stringify(this.connectionOptions)})`);
-    }
 
     return connection;
   }

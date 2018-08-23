@@ -37,29 +37,28 @@
   "dependencies": {
     "@types/del": "^3.0.1",
     "@types/glob": "^5.0.35",
-    "@types/inquirer": "^0.0.42",
+    "@types/inquirer": "^0.0.43",
     "babel-jest": "^23.4.2",
     "chalk": "^2.4.1",
     "del": "^3.0.0",
     "glob": "^7.1.2",
-    "inquirer": "^6.0.0",
+    "inquirer": "^6.2.0",
     "listr": "^0.14.1",
     "string-natural-compare": "^2.0.2",
-    "tslint-config-strict": "^1.12.0",
     "typeorm": "^0.2.7"
   },
   "devDependencies": {
     "@types/jest": "^23.3.1",
     "babel-core": "^6.26.3",
     "coveralls": "^3.0.1",
-    "jest": "^23.4.2",
-    "prettier": "^1.14.0",
+    "jest": "^23.5.0",
+    "prettier": "^1.14.2",
     "rimraf": "^2.6.2",
     "sqlite3": "^4.0.2",
-    "ts-jest": "^23.1.2",
+    "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.14.0",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "typestrict": "^1.0.0"
   },
   "jest": {
     "transform": {

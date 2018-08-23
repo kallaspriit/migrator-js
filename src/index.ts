@@ -100,7 +100,6 @@ export class Migrator<Context> {
     this.options = {
       pattern: path.join(__dirname, "..", "..", "src", "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
       storage: new MigratorTypeormStorage(connectionOptions),
-      autorunAll: false,
       ...userOptions,
     };
   }
@@ -149,80 +148,80 @@ export class Migrator<Context> {
           ),
       );
   }
-}
 
-export default async function migrate<Context>(
-  context: Context,
-  options: Partial<MigratorOptions>,
-): Promise<MigrationResult> {
-  return new Promise<MigrationResult>(async (resolve, _reject) => {
-    const migrator = new Migrator(context, options);
-    const pendingMigrations = await migrator.getPendingMigrations();
+  public async migrate(autoRun = false): Promise<MigrationResult> {
+    return new Promise<MigrationResult>(async (resolve, _reject) => {
+      const pendingMigrations = await this.getPendingMigrations();
 
-    if (pendingMigrations.length === 0) {
+      if (pendingMigrations.length === 0) {
+        resolve({
+          pendingMigrations,
+          chosenMigrations: [],
+          performedMigrations: [],
+          failedMigrations: [],
+        });
+
+        return;
+      }
+
+      let chosenMigrationFilenames: string[] = [];
+
+      /* istanbul ignore else  */
+      if (autoRun) {
+        chosenMigrationFilenames = pendingMigrations.map(pendingMigration => pendingMigration.filename);
+      } else {
+        // this is very hard to test
+        const choiceResult = await inquirer.prompt<MigrationPromptResult>([
+          {
+            type: "checkbox",
+            name: "chosenMigrations",
+            message: "Choose migrations to execute",
+            choices: pendingMigrations.map(pendingMigration => ({
+              name: pendingMigration.name,
+              value: pendingMigration.filename,
+            })),
+          },
+        ]);
+        chosenMigrationFilenames = choiceResult.chosenMigrations;
+      }
+
+      const chosenMigrations = pendingMigrations.filter(
+        pendingMigration => chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1,
+      );
+
+      const taskRunner = new Listr<Context>(
+        chosenMigrations.map(migration => ({
+          title: migration.name,
+          async task() {
+            try {
+              await migration.run();
+
+              this.title = `${this.title} - done in ${migration.timeTaken}ms`;
+            } catch (e) {
+              this.title = `${this.title} - failed in ${migration.timeTaken}ms`;
+
+              throw e;
+            }
+          },
+        })),
+      );
+
+      try {
+        await taskRunner.run();
+      } catch (_e) {
+        // ignore error, states get updated
+      }
+
       resolve({
         pendingMigrations,
-        chosenMigrations: [],
-        performedMigrations: [],
-        failedMigrations: [],
+        chosenMigrations,
+        performedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.COMPLETE),
+        failedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.FAILED),
       });
-
-      return;
-    }
-
-    let chosenMigrationFilenames: string[] = [];
-
-    /* istanbul ignore else  */
-    if (options.autorunAll === true) {
-      chosenMigrationFilenames = pendingMigrations.map(pendingMigration => pendingMigration.filename);
-    } else {
-      // this is very hard to test
-      const choiceResult = await inquirer.prompt<MigrationPromptResult>([
-        {
-          type: "checkbox",
-          name: "chosenMigrations",
-          message: "Choose migrations to execute",
-          choices: pendingMigrations.map(pendingMigration => ({
-            name: pendingMigration.name,
-            value: pendingMigration.filename,
-          })),
-        },
-      ]);
-      chosenMigrationFilenames = choiceResult.chosenMigrations;
-    }
-
-    const chosenMigrations = pendingMigrations.filter(
-      pendingMigration => chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1,
-    );
-
-    const taskRunner = new Listr<Context>(
-      chosenMigrations.map(migration => ({
-        title: migration.name,
-        async task() {
-          try {
-            await migration.run();
-
-            this.title = `${this.title} - done in ${migration.timeTaken}ms`;
-          } catch (e) {
-            this.title = `${this.title} - failed in ${migration.timeTaken}ms`;
-
-            throw e;
-          }
-        },
-      })),
-    );
-
-    try {
-      await taskRunner.run();
-    } catch (_e) {
-      // ignore error, states get updated
-    }
-
-    resolve({
-      pendingMigrations,
-      chosenMigrations,
-      performedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.COMPLETE),
-      failedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.FAILED),
     });
-  });
+  }
+
+  public async close() {
+    await this.options.storage.close();
+  }
 }

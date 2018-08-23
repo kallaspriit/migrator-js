@@ -40,30 +40,34 @@ var path = require("path");
 var src_1 = require("../src");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var result, pendingMigrations, chosenMigrations, performedMigrations, failedMigrations, e_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var migrator, _a, pendingMigrations, chosenMigrations, performedMigrations, failedMigrations, e_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     // show an empty line between previous content
                     console.log("");
-                    _a.label = 1;
+                    migrator = new src_1.Migrator(
+                    // this is the custom context matching MigrationContext
+                    {
+                        version: "1",
+                    }, 
+                    // migrator configuration
+                    {
+                        // pattern for finding the migration scripts
+                        pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
+                        // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
+                        // see http://typeorm.io
+                        storage: new src_1.MigratorTypeormStorage({
+                            type: "sqlite",
+                            database: path.join(__dirname, "..", "..", "migrate.sqlite3"),
+                        }),
+                    });
+                    _b.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, src_1.default({
-                            version: "1",
-                        }, {
-                            // pattern for finding the migration scripts
-                            pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
-                            // you can use MySQL / MariaDB / Postgres / SQLite / Microsoft SQL Server / Oracle / WebSQL
-                            // see http://typeorm.io
-                            storage: new src_1.MigratorTypeormStorage({
-                                type: "sqlite",
-                                database: path.join(__dirname, "..", "..", "migrate.sqlite3"),
-                            }),
-                        })];
+                    _b.trys.push([1, 3, 4, 6]);
+                    return [4 /*yield*/, migrator.migrate()];
                 case 2:
-                    result = _a.sent();
-                    pendingMigrations = result.pendingMigrations, chosenMigrations = result.chosenMigrations, performedMigrations = result.performedMigrations, failedMigrations = result.failedMigrations;
+                    _a = _b.sent(), pendingMigrations = _a.pendingMigrations, chosenMigrations = _a.chosenMigrations, performedMigrations = _a.performedMigrations, failedMigrations = _a.failedMigrations;
                     // print results to console
                     if (pendingMigrations.length === 0) {
                         console.error(chalk_1.default.black.bgWhite(" NOTHING TO MIGRATE ") + " ");
@@ -87,12 +91,19 @@ function run() {
                     else {
                         process.exit(1);
                     }
-                    return [3 /*break*/, 4];
+                    return [3 /*break*/, 6];
                 case 3:
-                    e_1 = _a.sent();
+                    e_1 = _b.sent();
                     console.error("" + chalk_1.default.black.bgRed(" RUNNING MIGRATOR FAILED "), e_1.stack);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
+                    return [3 /*break*/, 6];
+                case 4: 
+                // gracefully close the connection
+                return [4 /*yield*/, migrator.close()];
+                case 5:
+                    // gracefully close the connection
+                    _b.sent();
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/];
             }
         });
     });

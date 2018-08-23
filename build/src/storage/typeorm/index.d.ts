@@ -3,6 +3,7 @@ import { MigrationInfo, MigrationStatus, MigrationStorage } from "../../common";
 export interface DatabaseResult {
     [x: string]: string | number;
 }
+export declare const DEFAULT_DATABASE_CONNECTION_NAME = "migrator";
 export declare class Migration {
     name: string;
     filename: string;
@@ -12,7 +13,6 @@ export declare class Migration {
     startDate: Date;
     endDate: Date;
 }
-export declare const DATABASE_CONNECTION_NAME = "migrator";
 export default class MigratorTypeormStorage implements MigrationStorage {
     private readonly connectionOptions;
     constructor(connectionOptions: ConnectionOptions);
@@ -20,5 +20,6 @@ export default class MigratorTypeormStorage implements MigrationStorage {
     getPerformedMigrations(): Promise<MigrationInfo[]>;
     insertMigration(name: string, filename: string): Promise<void>;
     updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
-    private getConnection;
+    close(): Promise<void>;
+    private openConnection;
 }

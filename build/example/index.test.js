@@ -61,19 +61,9 @@ function getConnectionOptions() {
         database: path.join(__dirname, "..", "migrate-" + Date.now() + "-" + migratorCount + ".sqlite3"),
     };
 }
-function getMigratorOptions() {
-    return {
-        pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
-        storage: new src_1.MigratorTypeormStorage(getConnectionOptions()),
-        autorunAll: false,
-    };
-}
-function setupMigrator() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, new src_1.Migrator(context, getMigratorOptions())];
-        });
-    });
+function getMigratorOptions(override) {
+    if (override === void 0) { override = {}; }
+    return __assign({ pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"), storage: new src_1.MigratorTypeormStorage(getConnectionOptions()) }, override);
 }
 function preprocessSnapshot(migration) {
     return {
@@ -82,9 +72,24 @@ function preprocessSnapshot(migration) {
         result: migration.result,
     };
 }
+var migrator;
 describe("migrator-js", function () {
-    // delete generated sqlite databases
+    // close the migrator after each test
     afterEach(function () { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!migrator) return [3 /*break*/, 2];
+                    return [4 /*yield*/, migrator.close()];
+                case 1:
+                    _a.sent();
+                    _a.label = 2;
+                case 2: return [2 /*return*/];
+            }
+        });
+    }); });
+    // delete the generated test databases after all tests
+    afterAll(function () { return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, del([path.join(__dirname, "..", "*.sqlite3")])];
@@ -95,15 +100,17 @@ describe("migrator-js", function () {
         });
     }); });
     it("should provide list of pending migrations", function () { return __awaiter(_this, void 0, void 0, function () {
-        var migrator, pendingMigrations;
+        var pendingMigrations;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, setupMigrator()];
-                case 1:
-                    migrator = _a.sent();
+                case 0:
+                    migrator = new src_1.Migrator(context, getMigratorOptions());
                     return [4 /*yield*/, migrator.getPendingMigrations()];
-                case 2:
+                case 1:
                     pendingMigrations = _a.sent();
+                    return [4 /*yield*/, migrator.close()];
+                case 2:
+                    _a.sent();
                     expect(preprocessSnapshot(pendingMigrations[0].toJSON())).toMatchSnapshot();
                     expect(pendingMigrations.map(preprocessSnapshot)).toMatchSnapshot();
                     return [2 /*return*/];
@@ -111,23 +118,22 @@ describe("migrator-js", function () {
         });
     }); });
     it("should run a single migration", function () { return __awaiter(_this, void 0, void 0, function () {
-        var migrator, pendingMigrations1, result, pendingMigrations2;
+        var pendingMigrations1, result, pendingMigrations2;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, setupMigrator()];
-                case 1:
-                    migrator = _a.sent();
+                case 0:
+                    migrator = new src_1.Migrator(context, getMigratorOptions());
                     return [4 /*yield*/, migrator.getPendingMigrations()];
-                case 2:
+                case 1:
                     pendingMigrations1 = _a.sent();
                     expect(pendingMigrations1).toHaveLength(2);
                     expect(pendingMigrations1.map(preprocessSnapshot)).toMatchSnapshot();
                     return [4 /*yield*/, pendingMigrations1[0].run()];
-                case 3:
+                case 2:
                     result = _a.sent();
                     expect(result).toMatchSnapshot();
                     return [4 /*yield*/, migrator.getPendingMigrations()];
-                case 4:
+                case 3:
                     pendingMigrations2 = _a.sent();
                     expect(pendingMigrations2).toHaveLength(1);
                     expect(pendingMigrations2.map(preprocessSnapshot)).toMatchSnapshot();
@@ -136,22 +142,21 @@ describe("migrator-js", function () {
         });
     }); });
     it("should handle failing migration", function () { return __awaiter(_this, void 0, void 0, function () {
-        var migrator, pendingMigrations1, pendingMigrations2;
+        var pendingMigrations1, pendingMigrations2;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, setupMigrator()];
-                case 1:
-                    migrator = _a.sent();
+                case 0:
+                    migrator = new src_1.Migrator(context, getMigratorOptions());
                     return [4 /*yield*/, migrator.getPendingMigrations()];
-                case 2:
+                case 1:
                     pendingMigrations1 = _a.sent();
                     expect(pendingMigrations1).toHaveLength(2);
                     expect(pendingMigrations1.map(preprocessSnapshot)).toMatchSnapshot();
                     return [4 /*yield*/, expect(pendingMigrations1[1].run()).rejects.toHaveProperty("message", "Example failure message")];
-                case 3:
+                case 2:
                     _a.sent();
                     return [4 /*yield*/, migrator.getPendingMigrations()];
-                case 4:
+                case 3:
                     pendingMigrations2 = _a.sent();
                     expect(pendingMigrations2).toHaveLength(2);
                     expect(pendingMigrations2.map(preprocessSnapshot)).toMatchSnapshot();
@@ -163,7 +168,9 @@ describe("migrator-js", function () {
         var results;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, src_1.default(context, __assign({}, getMigratorOptions(), { autorunAll: true }))];
+                case 0:
+                    migrator = new src_1.Migrator(context, getMigratorOptions());
+                    return [4 /*yield*/, migrator.migrate(true)];
                 case 1:
                     results = _a.sent();
                     expect({
@@ -180,7 +187,11 @@ describe("migrator-js", function () {
         var results;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, src_1.default(context, __assign({}, getMigratorOptions(), { autorunAll: true, pattern: "xxx" }))];
+                case 0:
+                    migrator = new src_1.Migrator(context, getMigratorOptions({
+                        pattern: "xxx",
+                    }));
+                    return [4 /*yield*/, migrator.migrate(true)];
                 case 1:
                     results = _a.sent();
                     expect({

@@ -17,12 +17,12 @@ export interface MigrationStorage {
     getPerformedMigrations(): Promise<MigrationInfo[]>;
     insertMigration(name: string, filename: string): Promise<void>;
     updateMigration(name: string, status: MigrationStatus, result: string, timeTaken: number): Promise<void>;
+    close(): Promise<void>;
 }
 export declare type MigrationExecutorFn<Context> = (context: Context) => Promise<string>;
 export interface MigratorOptions {
     pattern: string;
     storage: MigrationStorage;
-    autorunAll: boolean;
 }
 export interface MigrationResult {
     pendingMigrations: MigrationInfo[];

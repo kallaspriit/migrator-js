@@ -24,5 +24,6 @@ export declare class Migrator<Context> {
     getMigrationFilenames(): Promise<string[]>;
     getPerformedMigrations(): Promise<MigrationInfo[]>;
     getPendingMigrations(): Promise<Array<Migration<Context>>>;
+    migrate(autoRun?: boolean): Promise<MigrationResult>;
+    close(): Promise<void>;
 }
-export default function migrate<Context>(context: Context, options: Partial<MigratorOptions>): Promise<MigrationResult>;
