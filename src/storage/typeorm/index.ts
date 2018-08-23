@@ -118,7 +118,7 @@ export default class MigratorTypeormStorage implements MigrationStorage {
     try {
       const existingConnection = getConnection(name);
 
-      if (existingConnection) {
+      if (existingConnection && existingConnection.isConnected) {
         return existingConnection;
       }
     } catch (e) {

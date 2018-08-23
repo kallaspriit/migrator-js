@@ -205,7 +205,7 @@ var MigratorTypeormStorage = /** @class */ (function () {
                         // use existing connection if exists
                         try {
                             existingConnection = typeorm_1.getConnection(name);
-                            if (existingConnection) {
+                            if (existingConnection && existingConnection.isConnected) {
                                 return [2 /*return*/, existingConnection];
                             }
                         }
