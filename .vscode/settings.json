@@ -14,5 +14,9 @@
   "prettier.printWidth": 120,
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "tslint.enable": true,
-  "tslint.autoFixOnSave": false
+  "tslint.autoFixOnSave": false,
+  "cSpell.words": [
+    "Typeorm",
+    "varchar"
+  ]
 }

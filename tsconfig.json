@@ -13,6 +13,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
 
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,

@@ -1,6 +1,6 @@
 {
   "name": "migrator-js",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "Simple extensible one-way migration tool for performing various tasks in order in multiple environments.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -17,7 +17,7 @@
     "test": "jest",
     "test-watch": "jest --watch --collectCoverage",
     "coverage": "yarn tidy:coverage && jest --collectCoverage",
-    "audit": "yarn prettier && yarn build && yarn lint && yarn test",
+    "validate": "yarn prettier && yarn build && yarn lint && yarn test",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
@@ -35,30 +35,30 @@
   },
   "homepage": "https://github.com/kallaspriit/migrator-js#readme",
   "dependencies": {
-    "@types/del": "^3.0.1",
-    "@types/glob": "^5.0.35",
-    "@types/inquirer": "^0.0.43",
-    "babel-jest": "^23.4.2",
-    "chalk": "^2.4.1",
-    "del": "^3.0.0",
-    "glob": "^7.1.2",
-    "inquirer": "^6.2.0",
-    "listr": "^0.14.1",
-    "string-natural-compare": "^2.0.2",
-    "typeorm": "^0.2.7"
+    "chalk": "^2.4.2",
+    "del": "^4.1.1",
+    "glob": "^7.1.3",
+    "inquirer": "^6.3.1",
+    "listr": "^0.14.3",
+    "string-natural-compare": "^2.0.3",
+    "typeorm": "^0.2.16"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.1",
+    "@types/del": "^4.0.0",
+    "@types/glob": "^7.1.1",
+    "@types/inquirer": "^6.0.1",
+    "@types/jest": "^24.0.12",
     "babel-core": "^6.26.3",
-    "coveralls": "^3.0.1",
-    "jest": "^23.5.0",
-    "prettier": "^1.14.2",
-    "rimraf": "^2.6.2",
-    "sqlite3": "^4.0.2",
-    "ts-jest": "^23.1.4",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.1",
-    "typestrict": "^1.0.0"
+    "babel-jest": "^24.7.1",
+    "coveralls": "^3.0.3",
+    "jest": "^24.7.1",
+    "prettier": "^1.17.0",
+    "rimraf": "^2.6.3",
+    "sqlite3": "^4.0.6",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5",
+    "typestrict": "^1.0.2"
   },
   "jest": {
     "transform": {
