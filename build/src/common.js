@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MigrationStatus = void 0;
 var MigrationStatus;
 (function (MigrationStatus) {
     MigrationStatus["PENDING"] = "PENDING";

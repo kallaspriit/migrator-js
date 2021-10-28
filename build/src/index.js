@@ -11,10 +11,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -46,6 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Migrator = exports.Migration = void 0;
 var glob = require("glob");
 var inquirer = require("inquirer");
 var Listr = require("listr");
@@ -54,12 +56,12 @@ var naturalSort = require("string-natural-compare");
 var common_1 = require("./common");
 var typeorm_1 = require("./storage/typeorm");
 var typeorm_2 = require("./storage/typeorm");
-exports.MigratorTypeormStorage = typeorm_2.default;
+Object.defineProperty(exports, "MigratorTypeormStorage", { enumerable: true, get: function () { return typeorm_2.default; } });
 var typeorm_3 = require("typeorm");
-exports.Connection = typeorm_3.Connection;
-exports.createConnection = typeorm_3.createConnection;
+Object.defineProperty(exports, "Connection", { enumerable: true, get: function () { return typeorm_3.Connection; } });
+Object.defineProperty(exports, "createConnection", { enumerable: true, get: function () { return typeorm_3.createConnection; } });
 var common_2 = require("./common");
-exports.MigrationStatus = common_2.MigrationStatus;
+Object.defineProperty(exports, "MigrationStatus", { enumerable: true, get: function () { return common_2.MigrationStatus; } });
 var Migration = /** @class */ (function () {
     function Migration(name, filename, context, storage) {
         this.name = name;

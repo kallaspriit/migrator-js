@@ -1,1 +1,1 @@
-{"version":3,"file":"002-fail-example.js","sourceRoot":"","sources":["../../../example/migrations/002-fail-example.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,iBAKA;;AAHA,mBAAe,UAAO,QAA0B;;QAC9C,MAAM,IAAI,KAAK,CAAC,yBAAyB,CAAC,CAAC;;KAC5C,EAAC"}
+{"version":3,"file":"002-fail-example.js","sourceRoot":"","sources":["../../../example/migrations/002-fail-example.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAEA,mBAAe,UAAO,QAA0B;;QAC9C,MAAM,IAAI,KAAK,CAAC,yBAAyB,CAAC,CAAC;;KAC5C,EAAC"}
