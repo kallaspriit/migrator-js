@@ -1,5 +1,5 @@
+import path from "path";
 import chalk from "chalk";
-import * as path from "path";
 import { Migrator, MigratorTypeormStorage } from "../src";
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts
@@ -64,11 +64,11 @@ async function run() {
       process.exit(1);
     }
   } catch (e) {
-    console.error(`${chalk.black.bgRed(` RUNNING MIGRATOR FAILED `)}`, e.stack);
+    console.error(`${chalk.black.bgRed(` RUNNING MIGRATOR FAILED `)}`, e);
   } finally {
     // gracefully close the connection
     await migrator.close();
   }
 }
 
-run().catch(e => console.error(chalk.black.bgRed(` RUNNING MIGRATOR FAILED `), e.stack));
+run().catch((e) => console.error(chalk.black.bgRed(` RUNNING MIGRATOR FAILED `), e.stack));

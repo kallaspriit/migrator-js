@@ -53,7 +53,6 @@ export class Migration {
   }
 }
 
-// tslint:disable-next-line:max-classes-per-file
 export default class MigratorTypeormStorage implements MigrationStorage {
   public constructor(private readonly connectionOptions: ConnectionOptions) {}
 
@@ -66,7 +65,7 @@ export default class MigratorTypeormStorage implements MigrationStorage {
       },
     });
 
-    return migrations.map(migration => migration.getInfo());
+    return migrations.map((migration) => migration.getInfo());
   }
 
   public async insertMigration(name: string, filename: string): Promise<void> {

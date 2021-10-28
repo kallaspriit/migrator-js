@@ -39,11 +39,11 @@ npm install migrator-js
 **Example migration script**
 
 ```javascript
-import {IMigrationContext} from '../';
+import { IMigrationContext } from "../";
 
 export default async (context: IMigrationContext): Promise<string> => {
   // run any query, crop images etc
-  const sum = await context.connection.query('SELECT 1+1 AS sum');
+  const sum = await context.connection.query("SELECT 1+1 AS sum");
 
   return `1+1=${sum}`;
 };
@@ -66,7 +66,7 @@ Store it in `src/scripts/migrate.ts` etc and add NPM script to run it.
 
 ```javascript
 import chalk from "chalk";
-import * as path from "path";
+import path from "path";
 import { Migrator, MigratorTypeormStorage } from "../src";
 
 // the contents of this file is usually kept in scripts/migrate.ts etc file and run through NPM scripts

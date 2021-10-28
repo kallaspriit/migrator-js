@@ -1,22 +1,9 @@
-// Place your settings in this file to overwrite default and user settings.
 {
-  "search.exclude": {
-		"**/node_modules": true,
-		"build/**/*": true,
-		".vscode/**/*": true,
-		"coverage/**/*": true,
-		"logs/**/*": true
-	},
-  "prettier.trailingComma": "all",
-  "prettier.singleQuote": true,
-  "prettier.useTabs": true,
-  "prettier.bracketSpacing": false,
-  "prettier.printWidth": 120,
-  "typescript.tsdk": "node_modules\\typescript\\lib",
-  "tslint.enable": true,
-  "tslint.autoFixOnSave": false,
-  "cSpell.words": [
-    "Typeorm",
-    "varchar"
-  ]
+  "editor.snippetSuggestions": "bottom",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "editor.tabSize": 2
 }

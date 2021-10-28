@@ -1,5 +1,5 @@
-import * as del from "del";
-import * as path from "path";
+import { join } from "path";
+import del from "del";
 import {
   ConnectionOptions,
   MigrationInfo,
@@ -28,13 +28,13 @@ function getConnectionOptions(): ConnectionOptions {
   return {
     type: "sqlite",
     name: `migrator-test-${++migratorCount}`,
-    database: path.join(__dirname, "..", `migrate-${Date.now()}-${migratorCount}.sqlite3`),
+    database: join(__dirname, "..", `migrate-${Date.now()}-${migratorCount}.sqlite3`),
   };
 }
 
 function getMigratorOptions(override: Partial<MigratorOptions> = {}): MigratorOptions {
   return {
-    pattern: path.join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
+    pattern: join(__dirname, "migrations", "!(*.spec|*.test|*.d).{ts,js}"),
     storage: new MigratorTypeormStorage(getConnectionOptions()),
     ...override,
   };
@@ -60,7 +60,7 @@ describe("migrator-js", () => {
 
   // delete the generated test databases after all tests
   afterAll(async () => {
-    await del([path.join(__dirname, "..", `*.sqlite3`)]);
+    await del([join(__dirname, "..", `*.sqlite3`)]);
   });
 
   it("should provide list of pending migrations", async () => {

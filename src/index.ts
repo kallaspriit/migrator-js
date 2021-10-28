@@ -1,8 +1,8 @@
-import * as glob from "glob";
-import * as inquirer from "inquirer";
-import * as Listr from "listr";
-import * as path from "path";
-import * as naturalSort from "string-natural-compare";
+import path from "path";
+import glob from "glob";
+import inquirer from "inquirer";
+import Listr from "listr";
+import naturalSort from "string-natural-compare";
 import { ConnectionOptions } from "typeorm";
 import {
   MigrationExecutorFn,
@@ -44,7 +44,9 @@ export class Migration<Context> implements MigrationInfo {
   ) {}
 
   public async run(): Promise<string> {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise<string>(async (resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const migration: MigrationExecutorFn<Context> = require(this.filename).default;
 
       await this.storage.insertMigration(this.name, this.filename);
@@ -61,12 +63,14 @@ export class Migration<Context> implements MigrationInfo {
 
         resolve(this.result);
       } catch (e) {
-        this.result = e.message;
+        const error = e as Error;
+
+        this.result = error.message;
         this.endDate = new Date();
         this.timeTaken = this.endDate.getTime() - this.startDate.getTime();
         this.status = MigrationStatus.FAILED;
 
-        await this.storage.updateMigration(this.name, this.status, e.stack, this.timeTaken);
+        await this.storage.updateMigration(this.name, this.status, error.stack ?? "", this.timeTaken);
 
         reject(e);
       }
@@ -86,7 +90,6 @@ export class Migration<Context> implements MigrationInfo {
   }
 }
 
-// tslint:disable-next-line:max-classes-per-file
 export class Migrator<Context> {
   private readonly options: MigratorOptions;
 
@@ -133,13 +136,13 @@ export class Migrator<Context> {
 
     return migrationFilenames
       .filter(
-        migrationFilename =>
+        (migrationFilename) =>
           performedMigrations.find(
-            performedMigration => performedMigration.name === Migrator.getMigrationName(migrationFilename),
+            (performedMigration) => performedMigration.name === Migrator.getMigrationName(migrationFilename),
           ) === undefined,
       )
       .map(
-        migrationFilename =>
+        (migrationFilename) =>
           new Migration(
             Migrator.getMigrationName(migrationFilename),
             migrationFilename,
@@ -150,6 +153,7 @@ export class Migrator<Context> {
   }
 
   public async migrate(autoRun = false): Promise<MigrationResult> {
+    // eslint-disable-next-line no-async-promise-executor, promise/param-names
     return new Promise<MigrationResult>(async (resolve, _reject) => {
       const pendingMigrations = await this.getPendingMigrations();
 
@@ -168,7 +172,7 @@ export class Migrator<Context> {
 
       /* istanbul ignore else  */
       if (autoRun) {
-        chosenMigrationFilenames = pendingMigrations.map(pendingMigration => pendingMigration.filename);
+        chosenMigrationFilenames = pendingMigrations.map((pendingMigration) => pendingMigration.filename);
       } else {
         // this is very hard to test
         const choiceResult = await inquirer.prompt<MigrationPromptResult>([
@@ -176,7 +180,7 @@ export class Migrator<Context> {
             type: "checkbox",
             name: "chosenMigrations",
             message: "Choose migrations to execute",
-            choices: pendingMigrations.map(pendingMigration => ({
+            choices: pendingMigrations.map((pendingMigration) => ({
               name: pendingMigration.name,
               value: pendingMigration.filename,
             })),
@@ -186,19 +190,19 @@ export class Migrator<Context> {
       }
 
       const chosenMigrations = pendingMigrations.filter(
-        pendingMigration => chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1,
+        (pendingMigration) => chosenMigrationFilenames.indexOf(pendingMigration.filename) !== -1,
       );
 
       const taskRunner = new Listr<Context>(
-        chosenMigrations.map(migration => ({
+        chosenMigrations.map((migration) => ({
           title: migration.name,
           async task() {
             try {
               await migration.run();
 
-              this.title = `${this.title} - done in ${migration.timeTaken}ms`;
+              this.title = `${this.title} - done in ${migration.timeTaken ?? "??"}ms`;
             } catch (e) {
-              this.title = `${this.title} - failed in ${migration.timeTaken}ms`;
+              this.title = `${this.title} - failed in ${migration.timeTaken ?? "??"}ms`;
 
               throw e;
             }
@@ -215,8 +219,8 @@ export class Migrator<Context> {
       resolve({
         pendingMigrations,
         chosenMigrations,
-        performedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.COMPLETE),
-        failedMigrations: chosenMigrations.filter(migration => migration.status === MigrationStatus.FAILED),
+        performedMigrations: chosenMigrations.filter((migration) => migration.status === MigrationStatus.COMPLETE),
+        failedMigrations: chosenMigrations.filter((migration) => migration.status === MigrationStatus.FAILED),
       });
     });
   }
